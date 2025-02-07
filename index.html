@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Gallery</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <div id="header">
+    <div class="header-content">
+      <h1 id="site-title">Rule 34</h1>
+      <div class="tag-search">
+        <form onsubmit="searchPosts(); return false;">
+          <div class="search-container">
+            <input type="text" id="tagsInput" value="">
+            <button type="submit" class="search-button">
+              <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path d="M10 2a8 8 0 0 1 6.32 12.906l5.387 5.387a1 1 0 0 1-1.414 1.414l-5.387-5.387A8 8 0 1 1 10 2zm0 2a6 6 0 1 0 0 12 6 6 0 0 0 0-12z"/>
+              </svg>
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <div class="container">
+    <div class="sidebar" id="sidebar">
+      <div class="sidebar-header">
+        <h5>Популярные теги</h5>
+        <button class="close-sidebar" onclick="toggleSidebar()">×</button>
+      </div>
+      <ul>
+        <li><a href="#" onclick="addTagToSearch('sort:score')">sort:score</a></li>
+        <li><a href="#" onclick="addTagToSearch('animated')">animated</a></li>
+        <li><a href="#" onclick="addTagToSearch('2d')">2d</a></li>
+        <li><a href="#" onclick="addTagToSearch('cute')">cute</a></li>
+      </ul>
+    </div>
+
+    <div class="image-list" id="postsContainer"></div>
+  </div>
+
+  <div id="paginator">
+    <div class="pagination">
+      <a href="#" onclick="changePage(-1)">&lt;</a>
+      <span id="currentPage" 
+            contenteditable="true"
+            onkeydown="handlePageInput(event)"
+            onblur="updatePageFromInput()"
+            role="textbox"
+            aria-label="Текущая страница"></span>
+      <a href="#" onclick="changePage(1)">&gt;</a>
+    </div>
+  </div>
+
+  <div class="media-view" id="mediaView">
+    <button class="close-btn" onclick="closeMediaView()">×</button>
+    <div class="media-content" id="mediaContent"></div>
+  </div>
+
+  <script src="js/script.js"></script>
+</body>
+</html>
