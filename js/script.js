@@ -89,6 +89,7 @@ async function openMediaView(post) {
   `;
 
   mediaView.classList.add('active');
+  history.pushState({ mediaViewOpen: true }, '');
 }
 
 function closeMediaView() {
@@ -100,6 +101,9 @@ function closeMediaView() {
   });
   document.body.style.overflow = '';
   document.getElementById('mediaView').classList.remove('active');
+  if (window.history.state?.mediaViewOpen) {
+    history.back();
+  }
 }
 
 async function fetchComments(postId) {
@@ -176,4 +180,20 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('sidebar').style.display = 'none';
   }
   searchPosts();
+});
+
+document.getElementById('mediaView').addEventListener('click', function(e) {
+  if (e.target === this) closeMediaView();
+});
+
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'Escape' && document.getElementById('mediaView').classList.contains('active')) {
+    closeMediaView();
+  }
+});
+
+window.addEventListener('popstate', function() {
+  if (document.getElementById('mediaView').classList.contains('active')) {
+    closeMediaView();
+  }
 });
