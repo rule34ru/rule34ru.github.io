@@ -190,7 +190,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     while(currentFile <= MAX_TAG_FILES) {
       try {
-        const response = await fetch(`tags8/tags_${currentFile}.json`);
+        const response = await fetch(`tags5/tags_${currentFile}.json`);
         
         if (!response.ok) {
           if (response.status === 404) break;
@@ -225,6 +225,10 @@ document.addEventListener('DOMContentLoaded', async () => {
       minChars: 2,
       maxItems: 30,
       autoFirst: true,
+      mobile: true,
+      replace: function(text) {
+        this.input.value = text;
+      },
       filter: function(text, inputVal) {
         const words = inputVal.split(' ');
         const lastWord = words[words.length - 1].toLowerCase();
@@ -256,6 +260,13 @@ document.addEventListener('DOMContentLoaded', async () => {
       input.value = currentTags ? `${currentTags} ${e.text.value}` : e.text.value;
       searchPosts();
     });
+
+    // Добавлен обработчик для мобильных устройств
+    input.addEventListener('touchstart', function(e) {
+      if (this.value.length >= 2) {
+        awesomeplete.evaluate();
+      }
+    }, {passive: true});
 
     searchPosts();
 
