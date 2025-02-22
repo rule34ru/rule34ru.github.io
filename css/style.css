@@ -53,6 +53,7 @@ body {
   flex-grow: 1;
   min-width: 250px;
   max-width: 600px;
+  position: relative;
 }
 
 .search-container {
@@ -81,6 +82,7 @@ body {
   width: 24px;
   height: 24px;
   color: var(--c-text);
+  z-index: 2;
 }
 
 .search-button svg {
@@ -443,4 +445,67 @@ body {
   .pagination {
     gap: 5px;
   }
+}
+
+.awesomplete {
+  width: 100%;
+  position: relative;
+}
+
+.awesomplete > ul {
+  background: var(--c-bg-alt);
+  border: 1px solid var(--c-border);
+  border-top: none;
+  border-radius: 0 0 6px 6px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  margin: 0;
+  padding: 8px 0;
+  max-height: 300px;
+  overflow-y: auto;
+  position: absolute;
+  width: calc(100% + 2px);
+  left: -1px;
+  top: 100%;
+  z-index: 3;
+  animation: scaleIn 0.15s ease;
+}
+
+.awesomplete > ul > li {
+  color: var(--c-text);
+  padding: 8px 16px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  list-style: none;
+  line-height: 1.4;
+  box-sizing: border-box;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.awesomplete > ul > li:hover,
+.awesomplete > ul > li[aria-selected="true"] {
+  background: var(--c-link);
+  color: var(--c-bg);
+}
+
+.awesomplete mark {
+  background: rgba(74, 222, 128, 0.3);
+  color: inherit;
+}
+
+@keyframes scaleIn {
+  from {
+    opacity: 0;
+    transform: translateY(-3px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.awesomplete .visually-hidden,
+.awesomplete [aria-selected="false"]:empty {
+  display: none !important;
 }
