@@ -190,7 +190,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     while(currentFile <= MAX_TAG_FILES) {
       try {
-        const response = await fetch(`tags/tags_${currentFile}.json`);
+        const response = await fetch(`tags8/tags_${currentFile}.json`);
         
         if (!response.ok) {
           if (response.status === 404) break;
