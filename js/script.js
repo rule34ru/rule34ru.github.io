@@ -174,7 +174,52 @@ function toggleSidebar() {
   sidebar.style.display = isHidden ? 'block' : 'none';
   localStorage.setItem('sidebarHidden', !isHidden);
 }
+let allTags = [];
 
+// Функция для загрузки тегов из JSON-файлов
+async function loadTags() {
+  try {
+    // Загрузка тегов из JSON-файлов
+    const responses = await Promise.all([
+      fetch('tags/tags_1.json').then(r => r.json()),
+	  fetch('tags/tags_2.json').then(r => r.json()),
+	  fetch('tags/tags_3.json').then(r => r.json()),
+	  fetch('tags/tags_4.json').then(r => r.json()),
+	  fetch('tags/tags_5.json').then(r => r.json()),
+	  fetch('tags/tags_6.json').then(r => r.json()),
+	  fetch('tags/tags_7.json').then(r => r.json()),
+	  fetch('tags/tags_8.json').then(r => r.json()),
+      fetch('tags/tags_9.json').then(r => r.json())
+    ]);
+    
+    // Объединение и сортировка тегов
+    allTags = responses.flat()
+      .sort((a, b) => b.count - a.count)
+      .map(tag => tag.name);
+
+    // Инициализация Awesomplete
+    new Awesomplete(document.getElementById('tagsInput'), {
+      minChars: 2,
+      maxItems: 10,
+      autoFirst: true,
+      filter: () => true,
+      list: allTags,
+      sort: (a, b) => allTags.indexOf(a) - allTags.indexOf(b)
+    });
+
+  } catch (error) {
+    console.error('Ошибка загрузки тегов:', error);
+  }
+}
+
+// Инициализация при загрузке страницы
+document.addEventListener('DOMContentLoaded', () => {
+  if (localStorage.getItem('sidebarHidden') === 'true') {
+    document.getElementById('sidebar').style.display = 'none';
+  }
+  loadTags(); // Загружаем теги
+  searchPosts();
+});
 document.addEventListener('DOMContentLoaded', () => {
   if (localStorage.getItem('sidebarHidden') === 'true') {
     document.getElementById('sidebar').style.display = 'none';
