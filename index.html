@@ -3,8 +3,10 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" href="data:;base64,iVBORw0KGgo=">
   <title>Gallery</title>
-  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/awesome-complete/1.1.0/awesomplete.min.css">
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
   <div id="header">
@@ -13,7 +15,13 @@
       <div class="tag-search">
         <form onsubmit="searchPosts(); return false;">
           <div class="search-container">
-            <input type="text" id="tagsInput" value="">
+            <input 
+              type="text" 
+              id="tagsInput" 
+              placeholder="Поиск тегов..."
+              autocomplete="off"
+              aria-label="Поиск по тегам"
+            >
             <button type="submit" class="search-button">
               <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                 <path d="M10 2a8 8 0 0 1 6.32 12.906l5.387 5.387a1 1 0 0 1-1.414 1.414l-5.387-5.387A8 8 0 1 1 10 2zm0 2a6 6 0 1 0 0 12 6 6 0 0 0 0-12z"/>
@@ -60,6 +68,7 @@
     <div class="media-content" id="mediaContent"></div>
   </div>
 
-  <script src="js/script.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/awesomplete/1.1.5/awesomplete.min.js"></script>
+  <script src="script.js"></script>
 </body>
 </html>
