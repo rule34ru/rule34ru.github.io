@@ -22,6 +22,11 @@ body {
   line-height: 1.6;
 }
 
+input[type="text"] {
+  font-size: 16px;
+  transform: scale(1);
+}
+
 #header {
   background: var(--c-bg-alt);
   border-bottom: 2px solid var(--c-border);
@@ -444,6 +449,20 @@ body {
 
   .pagination {
     gap: 5px;
+  }
+
+  .awesomplete > ul {
+    width: 100vw;
+    left: 0;
+    border-radius: 0;
+    position: fixed;
+    top: calc(100% - 20px);
+    max-height: 50vh;
+    z-index: 1000;
+  }
+
+  .search-button {
+    right: 15px;
   }
 }
 
