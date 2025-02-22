@@ -1,5 +1,6 @@
 let currentPage = 0;
 const postsPerPage = 42;
+let awesomeplete;
 
 function getMediaType(post) {
   const url = post.file_url.toLowerCase();
@@ -8,8 +9,8 @@ function getMediaType(post) {
          ['mp4','webm','mov','avi','wmv','mkv','flv','gifv'].includes(extension) ? 'video' : 'image';
 }
 
-async function searchPosts() {
-  const tags = document.getElementById('tagsInput').value;
+async function searchPosts(tag = null) {
+  const tags = tag || document.getElementById('tagsInput').value;
   const url = `https://api.rule34.xxx/index.php?page=dapi&s=post&q=index&json=1&tags=${encodeURIComponent(tags)}&pid=${currentPage}`;
   
   try {
@@ -127,7 +128,9 @@ async function fetchComments(postId) {
 
 function addTagToSearch(tag) {
   const input = document.getElementById('tagsInput');
-  input.value = tag;
+  const currentTags = input.value.split(' ').filter(t => t);
+  currentTags.push(tag);
+  input.value = currentTags.join(' ');
   currentPage = 0;
   closeMediaView();
   searchPosts();
@@ -175,11 +178,90 @@ function toggleSidebar() {
   localStorage.setItem('sidebarHidden', !isHidden);
 }
 
-document.addEventListener('DOMContentLoaded', () => {
-  if (localStorage.getItem('sidebarHidden') === 'true') {
-    document.getElementById('sidebar').style.display = 'none';
+document.addEventListener('DOMContentLoaded', async () => {
+  try {
+    if (localStorage.getItem('sidebarHidden') === 'true') {
+      document.getElementById('sidebar').style.display = 'none';
+    }
+
+    let currentFile = 1;
+    const allTags = [];
+    const MAX_TAG_FILES = 20;
+
+    while(currentFile <= MAX_TAG_FILES) {
+      try {
+        const response = await fetch(`tags8/tags_${currentFile}.json`);
+        
+        if (!response.ok) {
+          if (response.status === 404) break;
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        const data = await response.json();
+        console.log(`Загружен файл tags_${currentFile}.json`);
+
+        const validTags = data.filter(item => 
+          item?.name && item?.count && !isNaN(Number(item.count))
+        );
+        
+        allTags.push(...validTags);
+        currentFile++;
+      } catch(e) {
+        console.error(`Ошибка загрузки tags_${currentFile}.json:`, e);
+        break;
+      }
+    }
+
+    const sortedTags = allTags
+      .map(tag => ({
+        name: tag.name.trim(),
+        count: Number(tag.count)
+      }))
+      .sort((a, b) => b.count - a.count);
+
+    const input = document.getElementById('tagsInput');
+    awesomeplete = new Awesomplete(input, {
+      list: sortedTags.map(t => t.name),
+      minChars: 2,
+      maxItems: 30,
+      autoFirst: true,
+      filter: function(text, inputVal) {
+        const words = inputVal.split(' ');
+        const lastWord = words[words.length - 1].toLowerCase();
+        return lastWord.length >= 2 && text.toLowerCase().includes(lastWord);
+      },
+      item: function(text, inputVal) {
+        const li = document.createElement('li');
+        const words = inputVal.split(' ');
+        const lastWord = words[words.length - 1].toLowerCase();
+        const regex = new RegExp(lastWord, 'gi');
+        li.innerHTML = text.replace(regex, '<mark>$&</mark>');
+        return li;
+      }
+    });
+
+    Awesomplete.prototype._isEmpty = function() {
+      return this.ul.childElementCount === 0;
+    };
+
+    Awesomplete.prototype._listItem = function(data) {
+      const li = document.createElement('li');
+      li.setAttribute('aria-selected', 'false');
+      li.innerHTML = data.text;
+      return li;
+    };
+
+    input.addEventListener('awesomplete-selectcomplete', (e) => {
+      const currentTags = input.value.split(' ').slice(0, -1).join(' ');
+      input.value = currentTags ? `${currentTags} ${e.text.value}` : e.text.value;
+      searchPosts();
+    });
+
+    searchPosts();
+
+  } catch (error) {
+    console.error('Глобальная ошибка:', error);
   }
-  searchPosts();
 });
 
 document.getElementById('mediaView').addEventListener('click', function(e) {
