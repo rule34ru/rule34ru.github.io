@@ -220,38 +220,53 @@ document.addEventListener('DOMContentLoaded', async () => {
       .sort((a, b) => b.count - a.count);
 
     const input = document.getElementById('tagsInput');
+    const mobileMode = 'ontouchstart' in window;
+    
     awesomeplete = new Awesomplete(input, {
-	  list: sortedTags.map(t => t.name),
-	  minChars: 2,
-	  maxItems: 30,
-	  autoFirst: true,
-	  mobile: true,
-	  replace: function(text) {
-		const currentValue = this.input.value;
-		const words = currentValue.split(' ');
-		words.pop();
-		words.push(text);
-		this.input.value = words.join(' ').replace(/\s+/g, ' ').trim() + ' ';
-		this.input.focus();
-	  },
-	  filter: function(text, inputVal) {
-		const words = inputVal.split(' ');
-		const lastWord = words[words.length - 1].toLowerCase();
-		return lastWord.length >= 2 && text.toLowerCase().includes(lastWord);
-	  },
-	  item: function(text, inputVal) {
-		const li = document.createElement('li');
-		const words = inputVal.split(' ');
-		const lastWord = words[words.length - 1].toLowerCase();
-		const regex = new RegExp(lastWord, 'gi');
-		li.innerHTML = text.replace(regex, '<mark>$&</mark>');
-		return li;
-	  }
-	});
+      list: sortedTags.map(t => t.name),
+      minChars: mobileMode ? 0 : 2,
+      maxItems: 30,
+      autoFirst: true,
+      mobile: true,
+      replace: function(text) {
+        const currentValue = this.input.value;
+        const words = currentValue.split(' ');
+        words.pop();
+        words.push(text);
+        this.input.value = words.join(' ').replace(/\s+/g, ' ').trim() + ' ';
+        this.input.focus();
+      },
+      filter: function(text, inputVal) {
+        const words = inputVal.split(' ');
+        const lastWord = words[words.length - 1].toLowerCase();
+        return mobileMode ? true : (lastWord.length >= 2 && text.toLowerCase().includes(lastWord));
+      },
+      item: function(text, inputVal) {
+        const li = document.createElement('li');
+        const words = inputVal.split(' ');
+        const lastWord = words[words.length - 1].toLowerCase();
+        const regex = new RegExp(lastWord, 'gi');
+        li.innerHTML = text.replace(regex, '<mark>$&</mark>');
+        li.style.touchAction = 'manipulation';
+        return li;
+      }
+    });
 
-	input.addEventListener('awesomplete-selectcomplete', () => {
-	  searchPosts();
-	});
+    if (mobileMode) {
+      input.addEventListener('focus', () => {
+        awesomeplete.evaluate();
+        input.scrollIntoView({behavior: 'smooth', block: 'center'});
+      });
+      
+      input.addEventListener('touchstart', (e) => {
+        e.stopPropagation();
+        awesomeplete.evaluate();
+      });
+    }
+
+    input.addEventListener('awesomplete-selectcomplete', () => {
+      searchPosts();
+    });
 
     searchPosts();
 
