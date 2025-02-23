@@ -190,7 +190,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     while(currentFile <= MAX_TAG_FILES) {
       try {
-        const response = await fetch(`tags5/tags_${currentFile}.json`);
+        const response = await fetch(`tags8/tags_${currentFile}.json`);
         
         if (!response.ok) {
           if (response.status === 404) break;
@@ -221,52 +221,37 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     const input = document.getElementById('tagsInput');
     awesomeplete = new Awesomplete(input, {
-      list: sortedTags.map(t => t.name),
-      minChars: 2,
-      maxItems: 30,
-      autoFirst: true,
-      mobile: true,
-      replace: function(text) {
-        this.input.value = text;
-      },
-      filter: function(text, inputVal) {
-        const words = inputVal.split(' ');
-        const lastWord = words[words.length - 1].toLowerCase();
-        return lastWord.length >= 2 && text.toLowerCase().includes(lastWord);
-      },
-      item: function(text, inputVal) {
-        const li = document.createElement('li');
-        const words = inputVal.split(' ');
-        const lastWord = words[words.length - 1].toLowerCase();
-        const regex = new RegExp(lastWord, 'gi');
-        li.innerHTML = text.replace(regex, '<mark>$&</mark>');
-        return li;
-      }
-    });
+	  list: sortedTags.map(t => t.name),
+	  minChars: 2,
+	  maxItems: 30,
+	  autoFirst: true,
+	  mobile: true,
+	  replace: function(text) {
+		const currentValue = this.input.value;
+		const words = currentValue.split(' ');
+		words.pop();
+		words.push(text);
+		this.input.value = words.join(' ').replace(/\s+/g, ' ').trim() + ' ';
+		this.input.focus();
+	  },
+	  filter: function(text, inputVal) {
+		const words = inputVal.split(' ');
+		const lastWord = words[words.length - 1].toLowerCase();
+		return lastWord.length >= 2 && text.toLowerCase().includes(lastWord);
+	  },
+	  item: function(text, inputVal) {
+		const li = document.createElement('li');
+		const words = inputVal.split(' ');
+		const lastWord = words[words.length - 1].toLowerCase();
+		const regex = new RegExp(lastWord, 'gi');
+		li.innerHTML = text.replace(regex, '<mark>$&</mark>');
+		return li;
+	  }
+	});
 
-    Awesomplete.prototype._isEmpty = function() {
-      return this.ul.childElementCount === 0;
-    };
-
-    Awesomplete.prototype._listItem = function(data) {
-      const li = document.createElement('li');
-      li.setAttribute('aria-selected', 'false');
-      li.innerHTML = data.text;
-      return li;
-    };
-
-    input.addEventListener('awesomplete-selectcomplete', (e) => {
-      const currentTags = input.value.split(' ').slice(0, -1).join(' ');
-      input.value = currentTags ? `${currentTags} ${e.text.value}` : e.text.value;
-      searchPosts();
-    });
-
-    // Добавлен обработчик для мобильных устройств
-    input.addEventListener('touchstart', function(e) {
-      if (this.value.length >= 2) {
-        awesomeplete.evaluate();
-      }
-    }, {passive: true});
+	input.addEventListener('awesomplete-selectcomplete', () => {
+	  searchPosts();
+	});
 
     searchPosts();
 
