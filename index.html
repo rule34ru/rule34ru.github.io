@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!DOCTYPE html> 
 <html lang="ru">
 <head>
   <meta charset="UTF-8">
@@ -6,6 +6,7 @@
   <link rel="icon" href="data:;base64,iVBORw0KGgo=">
   <title>Gallery</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/awesome-complete/1.1.0/awesomplete.min.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/awesomplete/1.1.5/awesomplete.min.js"></script>
   <style>
     :root {
       --c-bg: #1a1f1a;
@@ -15,8 +16,6 @@
       --c-border: #374537;
       --c-hover: #34d399;
       --c-pastel-green: #98fb98;
-      --shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-      --transition: all 0.2s ease;
     }
 
     * {
@@ -60,58 +59,68 @@
       flex-shrink: 0;
     }
 
-    .tag-search {
-      flex-grow: 1;
-      min-width: 250px;
-      max-width: 600px;
-      position: relative;
-    }
-
     .search-container {
+      flex: 1;
+      max-width: 600px;
+      margin: 0 20px;
       position: relative;
-      width: 100%;
     }
 
-    #tagsInput {
+    #tagSearch {
       width: 100%;
-      padding: 1.25rem 2rem; /* Как в примере */
-      font-size: 1.1rem; /* Как в примере */
-      background: var(--c-bg);
-      border: 1px solid var(--c-border);
+      padding: 12px 20px;
+      background: var(--c-bg-alt);
+      border: 2px solid var(--c-border);
+      border-radius: 25px;
       color: var(--c-text);
-      border-radius: 50px; /* Закруглённые края как в примере */
-      outline: none;
-      transition: var(--transition);
+      font-size: 14px;
+      transition: all 0.3s ease;
     }
 
-    #tagsInput:focus {
+    #tagSearch:focus {
       border-color: var(--c-link);
-      box-shadow: 0 10px 20px -5px rgba(74, 222, 128, 0.15); /* Эффект фокуса как в примере */
+      box-shadow: 0 0 0 3px rgba(74, 222, 128, 0.2);
+      outline: none;
     }
 
-    .search-button {
-      position: absolute;
-      right: 12px;
-      top: 50%;
-      transform: translateY(-50%);
-      background: none;
-      border: none;
-      cursor: pointer;
-      padding: 0;
-      width: 24px;
-      height: 24px;
+    .awesomplete > ul {
+      background: var(--c-bg-alt);
+      border: 1px solid var(--c-border);
+      border-radius: 8px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
       color: var(--c-text);
-      z-index: 2;
-    }
-
-    .search-button svg {
+      list-style: none;
+      padding-left: 0;
       width: 100%;
-      height: 100%;
-      fill: currentColor;
+      position: absolute;
+      z-index: 1000;
+      margin-top: 5px;
     }
 
-    .search-button:hover {
-      color: var(--c-link);
+    .awesomplete > ul > li {
+      padding: 8px 15px;
+      transition: all 0.2s ease;
+    }
+
+    .awesomplete > ul > li:hover {
+      background: var(--c-link);
+      color: var(--c-bg);
+    }
+
+    .awesomplete li[role="status"] {
+      display: none !important;
+    }
+
+    .tag-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .tag-count {
+      font-size: 0.85em;
+      opacity: 0.8;
+      margin-left: 10px;
     }
 
     .container {
@@ -133,51 +142,6 @@
       transition: transform 0.3s ease;
     }
 
-    .sidebar-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 15px;
-    }
-
-    .close-sidebar {
-      background: none;
-      border: none;
-      color: var(--c-text);
-      cursor: pointer;
-      font-size: 24px;
-      padding: 0 5px;
-      line-height: 1;
-    }
-
-    .close-sidebar:hover {
-      color: var(--c-link);
-    }
-
-    .sidebar h5 {
-      color: var(--c-link);
-      margin: 0;
-      font-size: 1.1em;
-    }
-
-    .sidebar ul {
-      list-style: none;
-    }
-
-    .sidebar li {
-      margin: 10px 0;
-    }
-
-    .sidebar a {
-      color: var(--c-text);
-      text-decoration: none;
-      transition: color 0.3s;
-    }
-
-    .sidebar a:hover {
-      color: var(--c-link);
-    }
-
     .image-list {
       flex: 1;
       display: grid;
@@ -195,38 +159,6 @@
       border: 2px solid transparent;
       max-height: 240px;
       position: relative;
-    }
-
-    .thumb[data-media-type="video"],
-    .thumb[data-media-type="gif"] {
-      border-color: var(--c-pastel-green);
-    }
-
-    .thumb[data-aspect-ratio="tall"] {
-      max-height: 320px;
-    }
-
-    .thumb:hover {
-      transform: translateY(-5px);
-      box-shadow: 0 8px 15px rgba(0, 0, 0, 0.2);
-    }
-
-    .thumb img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      object-position: top center;
-      cursor: pointer;
-      transition: transform 0.3s ease;
-    }
-
-    .thumb[data-aspect-ratio="tall"] img {
-      object-fit: contain;
-      object-position: top;
-    }
-
-    .thumb:hover img {
-      transform: scale(1.05);
     }
 
     .media-view {
@@ -247,306 +179,123 @@
       display: flex;
     }
 
+    .media-view .close-btn {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      background: var(--c-bg-alt);
+      border: none;
+      color: var(--c-text);
+      font-size: 24px;
+      cursor: pointer;
+      padding: 5px 10px;
+      border-radius: 4px;
+      transition: all 0.2s ease;
+    }
+
+    .media-view .close-btn:hover {
+      background: var(--c-link);
+      color: var(--c-bg);
+    }
+
     .media-content {
       max-width: 90%;
-      max-height: 90vh;
-      position: relative;
-      background: var(--c-bg-alt);
-      border-radius: 12px;
-      overflow: auto;
-      width: 100%;
+      max-height: 90%;
       display: flex;
-      flex-direction: column;
+      justify-content: center;
       align-items: center;
-      padding: 20px;
     }
 
     .media-content img,
     .media-content video {
       max-width: 100%;
-      max-height: 80vh;
-      width: auto;
-      height: auto;
-      object-fit: contain;
-      margin: 0 auto;
-      display: block;
+      max-height: 100%;
+      border-radius: 8px;
     }
 
     .media-info {
-      padding: 20px;
-      background: var(--c-bg-alt);
-      width: 100%;
+      position: absolute;
+      bottom: 20px;
+      left: 20px;
+      right: 20px;
+      background: rgba(0, 0, 0, 0.8);
+      padding: 15px;
+      border-radius: 8px;
     }
 
     .tag-list {
       display: flex;
       flex-wrap: wrap;
-      gap: 8px;
-      margin: 10px 0;
-      justify-content: flex-start;
-      max-width: 100%;
+      gap: 5px;
     }
 
-    .tag-list.collapsed .tag:nth-child(n+11) {
-      display: none;
+    .tag-list.collapsed {
+      max-height: 100px;
+      overflow: hidden;
     }
 
-    .tag {
-      background: var(--c-bg);
+    .tag-list .tag {
+      background: var(--c-bg-alt);
       color: var(--c-text);
-      padding: 4px 10px;
+      border: 1px solid var(--c-border);
+      padding: 4px 8px;
       border-radius: 4px;
       font-size: 12px;
-      border: none;
       cursor: pointer;
-      transition: all 0.3s;
-      white-space: nowrap;
-      max-width: 100%;
-      overflow: hidden;
-      text-overflow: ellipsis;
+      transition: all 0.2s ease;
     }
 
-    .tag:hover {
+    .tag-list .tag:hover {
       background: var(--c-link);
       color: var(--c-bg);
     }
 
-    .close-btn {
-      position: absolute;
-      top: 15px;
-      right: 15px;
+    .show-more-tags {
       background: none;
       border: none;
-      color: var(--c-text);
-      font-size: 24px;
+      color: var(--c-link);
       cursor: pointer;
-      z-index: 1001;
+      font-size: 12px;
+      padding: 0;
+      margin-left: 5px;
     }
 
     .comments-section {
-      padding: 20px;
-      background: var(--c-bg);
-      border-radius: 8px;
       margin-top: 15px;
     }
 
     .comment {
-      padding: 10px;
-      border-bottom: 1px solid var(--c-border);
-      word-wrap: break-word;
-      overflow-wrap: anywhere;
-      hyphens: auto;
-      white-space: pre-wrap;
-      max-width: 100%;
-    }
-
-    #paginator {
-      margin: 20px 0;
-      text-align: center;
+      margin-bottom: 10px;
+      font-size: 12px;
     }
 
     .pagination {
       display: flex;
-      gap: 10px;
-      align-items: center;
       justify-content: center;
-      flex-wrap: wrap;
+      align-items: center;
+      gap: 10px;
+      margin-top: 20px;
     }
 
-    .pagination a,
-    .pagination span {
-      padding: 8px 12px;
-      border: 1px solid var(--c-border);
-      border-radius: 6px;
+    .pagination a {
+      color: var(--c-link);
       text-decoration: none;
-      color: var(--c-text);
-      transition: all 0.3s;
+      padding: 5px 10px;
+      border-radius: 4px;
+      transition: all 0.2s ease;
     }
 
     .pagination a:hover {
       background: var(--c-link);
-      border-color: var(--c-link);
       color: var(--c-bg);
     }
 
     #currentPage {
-      border: 1px solid var(--c-border);
-      border-radius: 6px;
-      outline: none;
-      transition: all 0.3s;
-      cursor: text;
-      background: var(--c-bg);
-      min-width: 40px;
-      padding: 8px 12px;
-      display: inline-block;
-    }
-
-    #currentPage:focus {
-      border-color: var(--c-link);
-      box-shadow: 0 0 0 2px rgba(74, 222, 128, 0.2);
-    }
-
-    .show-more-tags {
-      background: var(--c-link);
-      color: var(--c-bg);
-      border: none;
-      padding: 6px 12px;
+      padding: 5px 10px;
       border-radius: 4px;
-      cursor: pointer;
-      margin-top: 8px;
-      font-size: 12px;
-      align-self: center;
-    }
-
-    .show-more-tags:hover {
-      background: var(--c-hover);
-    }
-
-    .awesomplete {
-      width: 100%;
-      position: relative;
-    }
-
-    .awesomplete > ul {
       background: var(--c-bg-alt);
-      border: none;
-      border-radius: 12px; /* Как в примере */
-      box-shadow: var(--shadow);
-      margin-top: 10px;
-      padding: 0;
-      transform-origin: top center;
-      animation: scaleIn 0.15s ease;
-      max-height: 400px;
-      overflow-y: auto;
-      position: absolute;
-      width: 100%;
-      left: 0;
-      top: 100%;
-      z-index: 3;
-    }
-
-    .awesomplete > ul > li {
-      padding: 0;
-      transition: var(--transition);
-      border-bottom: 1px solid rgba(255, 255, 255, 0.05); /* Адаптировано под тёмную тему */
-    }
-
-    .awesomplete > ul > li:last-child {
-      border-bottom: none;
-    }
-
-    .awesomplete > ul > li:hover,
-    .awesomplete > ul > li[aria-selected="true"] {
-      background: var(--c-link);
-      transform: translateX(5px); /* Как в примере */
-    }
-
-    .tag-item {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      width: 100%;
-      padding: 12px 25px; /* Как в примере */
-    }
-
-    .tag-name {
-      font-weight: 500;
-      color: var(--c-text);
-    }
-
-    .awesomplete > ul > li:hover .tag-name {
-      color: var(--c-bg);
-    }
-
-    @keyframes scaleIn {
-      from {
-        opacity: 0;
-        transform: scale(0.95); /* Как в примере */
-      }
-      to {
-        opacity: 1;
-        transform: scale(1);
-      }
-    }
-
-    .awesomplete .visually-hidden,
-    .awesomplete [aria-selected="false"]:empty {
-      display: none !important;
-    }
-
-    @media (max-width: 768px) {
-      .container {
-        flex-direction: column;
-        padding: 15px;
-      }
-      
-      .header-content {
-        flex-direction: column;
-        align-items: stretch;
-        gap: 10px;
-        padding: 15px;
-      }
-      
-      #site-title {
-        font-size: 1.5em;
-        text-align: center;
-      }
-      
-      .tag-search {
-        width: 100%;
-        max-width: 100%;
-      }
-      
-      .sidebar {
-        width: 100%;
-        position: static;
-      }
-
-      .image-list {
-        grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-      }
-
-      .thumb {
-        max-height: 200px;
-      }
-
-      .media-content {
-        width: 100%;
-        padding: 10px;
-      }
-
-      .media-content img,
-      .media-content video {
-        max-height: 60vh;
-      }
-
-      .media-info {
-        padding: 10px;
-        font-size: 0.9em;
-      }
-
-      #currentPage {
-        padding: 6px 10px;
-        min-width: 35px;
-      }
-
-      .tag-list {
-        justify-content: center;
-      }
-
-      .pagination {
-        gap: 5px;
-      }
-
-      /* Адаптация поисковой строки для мобильных */
-      #tagsInput {
-        padding: 1rem 1.5rem; /* Как в примере */
-        font-size: 1rem; /* Как в примере */
-      }
-
-      .tag-item {
-        padding: 10px 15px; /* Как в примере */
-      }
+      border: 1px solid var(--c-border);
+      cursor: text;
     }
   </style>
 </head>
@@ -554,23 +303,14 @@
   <div id="header">
     <div class="header-content">
       <h1 id="site-title">Rule 34</h1>
-      <div class="tag-search">
-        <form onsubmit="searchPosts(); return false;">
-          <div class="search-container">
-            <input 
-              type="text" 
-              id="tagsInput" 
-              placeholder="Поиск тегов..."
-              autocomplete="off"
-              aria-label="Поиск по тегам"
-            >
-            <button type="submit" class="search-button">
-              <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                <path d="M10 2a8 8 0 0 1 6.32 12.906l5.387 5.387a1 1 0 0 1-1.414 1.414l-5.387-5.387A8 8 0 1 1 10 2zm0 2a6 6 0 1 0 0 12 6 6 0 0 0 0-12z"/>
-              </svg>
-            </button>
-          </div>
-        </form>
+      <div class="search-container">
+        <input 
+          type="text" 
+          id="tagSearch" 
+          placeholder="Поиск по тегам..."
+          autocomplete="off"
+          aria-label="Поиск по тегам"
+        >
       </div>
     </div>
   </div>
@@ -594,14 +334,14 @@
 
   <div id="paginator">
     <div class="pagination">
-      <a href="#" onclick="changePage(-1)"><</a>
+      <a href="#" onclick="changePage(-1)">&lt;</a>
       <span id="currentPage" 
             contenteditable="true"
             onkeydown="handlePageInput(event)"
             onblur="updatePageFromInput()"
             role="textbox"
             aria-label="Текущая страница"></span>
-      <a href="#" onclick="changePage(1)">></a>
+      <a href="#" onclick="changePage(1)">&gt;</a>
     </div>
   </div>
 
@@ -610,21 +350,65 @@
     <div class="media-content" id="mediaContent"></div>
   </div>
 
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/awesomplete/1.1.5/awesomplete.min.js"></script>
   <script>
     let currentPage = 0;
     const postsPerPage = 42;
-    let awesomeplete;
+
+    async function initSearch() {
+      try {
+        const response = await fetch('tags.json');
+        const tags = await response.json();
+        
+        const awesomplete = new Awesomplete(document.getElementById('tagSearch'), {
+          list: tags.map(tag => ({
+            label: tag.name,
+            value: tag.name,
+            count: tag.count,
+            id: tag.id
+          })),
+          filter: function(text, input) {
+            return Awesomplete.FILTER_CONTAINS(text, input.match(/[^\s]*$/)[0]);
+          },
+          item: function(item) {
+            const li = document.createElement('li');
+            li.innerHTML = `
+              <div class="tag-item">
+                <span>${item.value}</span>
+                <span class="tag-count">${item.count}</span>
+              </div>
+            `;
+            return li;
+          },
+          data: function(item) {
+            return item.label;
+          },
+          minChars: 1
+        });
+
+        document.getElementById('tagSearch').addEventListener('keypress', (e) => {
+          if (e.key === 'Enter') {
+            searchPosts();
+          }
+        });
+        
+        document.getElementById('tagSearch').addEventListener('awesomplete-selectcomplete', () => {
+          searchPosts();
+        });
+      } catch (error) {
+        console.error('Ошибка загрузки тегов:', error);
+      }
+    }
 
     function getMediaType(post) {
       const url = post.file_url.toLowerCase();
       const extension = url.split('.').pop().split(/[#?]/)[0];
       return extension === 'gif' ? 'gif' : 
-             ['mp4','webm','mov','avi','wmv','mkv','flv','gifv'].includes(extension) ? 'video' : 'image';
+            ['mp4','webm','mov','avi','wmv','mkv','flv','gifv'].includes(extension) ? 'video' : 'image';
     }
 
-    async function searchPosts(tag = null) {
-      const tags = tag || document.getElementById('tagsInput').value;
+    async function searchPosts() {
+      const tags = document.getElementById('tagSearch').value;
+      currentPage = 0;
       const url = `https://api.rule34.xxx/index.php?page=dapi&s=post&q=index&json=1&tags=${encodeURIComponent(tags)}&pid=${currentPage}`;
       
       try {
@@ -664,6 +448,22 @@
       });
     }
 
+    function addTagToSearch(tag) {
+      const input = document.getElementById('tagSearch');
+      input.value = input.value ? `${input.value} ${tag}` : tag;
+      searchPosts();
+    }
+
+    function changePage(direction) {
+      currentPage = Math.max(0, currentPage + direction);
+      searchPosts();
+    }
+
+    function updatePaginator() {
+      const pageElement = document.getElementById('currentPage');
+      pageElement.textContent = currentPage + 1;
+    }
+
     async function openMediaView(post) {
       document.body.style.overflow = 'hidden';
       const mediaView = document.getElementById('mediaView');
@@ -685,7 +485,7 @@
         ${mediaElement}
         <div class="media-info">
           <div class="tag-list collapsed">
-            ${tags.map(tag => `<button class="tag" onclick="addTagToSearch('${tag}')">${tag}</button>`).join('')}
+            ${tags.map(tag => `<button class="tag">${tag}</button>`).join('')}
             ${tags.length > 10 ? 
               `<button class="show-more-tags" onclick="expandTags(this)">
                 Показать ещё (${tags.length - 10})
@@ -740,26 +540,6 @@
       }
     }
 
-    function addTagToSearch(tag) {
-      const input = document.getElementById('tagsInput');
-      const currentTags = input.value.split(' ').filter(t => t);
-      currentTags.push(tag);
-      input.value = currentTags.join(' ');
-      currentPage = 0;
-      closeMediaView();
-      searchPosts();
-    }
-
-    function changePage(direction) {
-      currentPage = Math.max(0, currentPage + direction);
-      searchPosts();
-    }
-
-    function updatePaginator() {
-      const pageElement = document.getElementById('currentPage');
-      pageElement.textContent = currentPage + 1;
-    }
-
     function handlePageInput(event) {
       if (event.key === 'Enter') {
         event.preventDefault();
@@ -792,106 +572,12 @@
       localStorage.setItem('sidebarHidden', !isHidden);
     }
 
-    document.addEventListener('DOMContentLoaded', async () => {
-      try {
-        if (localStorage.getItem('sidebarHidden') === 'true') {
-          document.getElementById('sidebar').style.display = 'none';
-        }
-
-        let currentFile = 1;
-        const allTags = [];
-        const MAX_TAG_FILES = 20;
-
-        while(currentFile <= MAX_TAG_FILES) {
-          try {
-            const response = await fetch(`tags8/tags_${currentFile}.json`);
-            
-            if (!response.ok) {
-              if (response.status === 404) break;
-              throw new Error(`HTTP error! status: ${response.status}`);
-            }
-
-            const data = await response.json();
-            console.log(`Загружен файл tags_${currentFile}.json`);
-
-            const validTags = data.filter(item => 
-              item?.name && item?.count && !isNaN(Number(item.count))
-            );
-            
-            allTags.push(...validTags);
-            currentFile++;
-          } catch(e) {
-            console.error(`Ошибка загрузки tags_${currentFile}.json:`, e);
-            break;
-          }
-        }
-
-        const sortedTags = allTags
-          .map(tag => ({
-            name: tag.name.trim(),
-            count: Number(tag.count)
-          }))
-          .sort((a, b) => b.count - a.count);
-
-        const tagData = sortedTags.map(t => ({ label: t.name, value: t.name, count: t.count }));
-
-        const input = document.getElementById('tagsInput');
-        awesomeplete = new Awesomplete(input, {
-          list: tagData,
-          minChars: 1, /* Как в примере */
-          maxItems: 30,
-          autoFirst: true,
-          filter: function(text, input) {
-            return Awesomplete.FILTER_STARTSWITH(text.value, input); /* Как в примере */
-          },
-          item: function(item) {
-            const li = document.createElement('li');
-            li.innerHTML = `
-              <div class="tag-item">
-                <span class="tag-name">${item.value}</span> /* Без подсветки, как в примере */
-              </div>
-            `;
-            li.dataset.value = item.value;
-            return li;
-          },
-          sort: function(a, b) {
-            return tagData.indexOf(b) - tagData.indexOf(a); /* Как в примере */
-          },
-          replace: function(suggestion) {
-            const currentValue = this.input.value;
-            const words = currentValue.split(' ').filter(t => t);
-            words.push(suggestion.value);
-            this.input.value = words.join(' ').replace(/\s+/g, ' ').trim();
-            this.input.focus();
-            searchPosts(); /* Адаптация под ваш функционал */
-          }
-        });
-
-        input.addEventListener('awesomplete-selectcomplete', () => {
-          searchPosts();
-        });
-
-        searchPosts();
-
-      } catch (error) {
-        console.error('Глобальная ошибка:', error);
+    document.addEventListener('DOMContentLoaded', () => {
+      if (localStorage.getItem('sidebarHidden') === 'true') {
+        document.getElementById('sidebar').style.display = 'none';
       }
-    });
-
-    document.getElementById('mediaView').addEventListener('click', function(e) {
-      if (e.target === this) closeMediaView();
-    });
-
-    document.addEventListener('keydown', function(e) {
-      if (e.key === 'Escape' && document.getElementById('mediaView').classList.contains('active')) {
-        closeMediaView();
-      }
-    });
-
-    window.addEventListener('popstate', function() {
-      if (document.getElementById('mediaView').classList.contains('active')) {
-        closeMediaView();
-      }
+      initSearch();
+      searchPosts();
     });
   </script>
 </body>
