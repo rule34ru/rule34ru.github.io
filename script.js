@@ -221,51 +221,37 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     const input = document.getElementById('tagsInput');
     awesomeplete = new Awesomplete(input, {
-      list: sortedTags.map(t => t.name),
-      minChars: 2,
-      maxItems: 30,
-      autoFirst: true,
-      mobile: true,
-      replace: function(text) {
-        const currentValue = this.input.value;
-        const words = currentValue.split(' ');
-        words.pop();
-        words.push(text);
-        this.input.value = words.join(' ').replace(/\s+/g, ' ').trim() + ' ';
-        this.input.focus();
-      },
-      filter: function(text, inputVal) {
-        const words = inputVal.split(' ');
-        const lastWord = words[words.length - 1].toLowerCase();
-        return lastWord.length >= 2 && text.toLowerCase().includes(lastWord);
-      },
-      item: function(text, inputVal) {
-        const li = document.createElement('li');
-        const words = inputVal.split(' ');
-        const lastWord = words[words.length - 1].toLowerCase();
-        const regex = new RegExp(lastWord, 'gi');
-        li.innerHTML = text.replace(regex, '<mark>$&</mark>');
-        return li;
-      }
-    });
+	  list: sortedTags.map(t => t.name),
+	  minChars: 2,
+	  maxItems: 30,
+	  autoFirst: true,
+	  mobile: true,
+	  replace: function(text) {
+		const currentValue = this.input.value;
+		const words = currentValue.split(' ');
+		words.pop();
+		words.push(text);
+		this.input.value = words.join(' ').replace(/\s+/g, ' ').trim() + ' ';
+		this.input.focus();
+	  },
+	  filter: function(text, inputVal) {
+		const words = inputVal.split(' ');
+		const lastWord = words[words.length - 1].toLowerCase();
+		return lastWord.length >= 2 && text.toLowerCase().includes(lastWord);
+	  },
+	  item: function(text, inputVal) {
+		const li = document.createElement('li');
+		const words = inputVal.split(' ');
+		const lastWord = words[words.length - 1].toLowerCase();
+		const regex = new RegExp(lastWord, 'gi');
+		li.innerHTML = text.replace(regex, '<mark>$&</mark>');
+		return li;
+	  }
+	});
 
-    input.addEventListener('awesomplete-selectcomplete', () => {
-      searchPosts();
-    });
-
-    // Добавляем обработчик события focus для активации автозаполнения на мобильных устройствах
-    input.addEventListener('focus', function() {
-      if (this.value.length >= 2) {
-        awesomeplete.evaluate();
-      }
-    });
-
-    // Добавляем обработчик события input для обновления подсказок при вводе
-    input.addEventListener('input', function() {
-      if (this.value.length >= 2) {
-        awesomeplete.evaluate();
-      }
-    });
+	input.addEventListener('awesomplete-selectcomplete', () => {
+	  searchPosts();
+	});
 
     searchPosts();
 
