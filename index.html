@@ -15,6 +15,8 @@
       --c-border: #374537;
       --c-hover: #34d399;
       --c-pastel-green: #98fb98;
+      --shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      --transition: all 0.2s ease;
     }
 
     * {
@@ -56,6 +58,7 @@
       margin: 0;
       white-space: nowrap;
       flex-shrink: 0;
+      cursor: pointer;
     }
 
     .tag-search {
@@ -67,23 +70,24 @@
 
     .search-container {
       position: relative;
+      width: 100%;
     }
 
     #tagsInput {
       width: 100%;
-      padding: 12px 40px 12px 12px; /* Вернули исходный размер как в вашем старом коде */
+      padding: 1rem 1.5rem;
+      font-size: 1rem;
       background: var(--c-bg);
       border: 1px solid var(--c-border);
       color: var(--c-text);
       border-radius: 6px;
-      font-size: 16px; /* Вернули исходный размер шрифта */
-      transition: all 0.3s ease;
+      outline: none;
+      transition: var(--transition);
     }
 
     #tagsInput:focus {
       border-color: var(--c-link);
-      box-shadow: 0 0 0 3px rgba(74, 222, 128, 0.2);
-      outline: none;
+      box-shadow: 0 10px 20px -5px rgba(74, 222, 128, 0.15);
     }
 
     .search-button {
@@ -406,55 +410,37 @@
 
     .awesomplete > ul {
       background: var(--c-bg-alt);
-      border: 1px solid var(--c-border);
-      border-top: none;
-      border-radius: 0 0 6px 6px;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-      margin: 0;
-      padding: 8px 0;
-      max-height: 300px;
+      border: none;
+      border-radius: 12px;
+      box-shadow: var(--shadow);
+      margin-top: 10px;
+      padding: 0;
+      transform-origin: top center;
+      animation: scaleIn 0.15s ease;
+      max-height: 400px;
       overflow-y: auto;
+      overflow-x: hidden;
       position: absolute;
-      width: calc(100% + 2px);
-      left: -1px;
+      width: 100%;
+      left: 0;
       top: 100%;
       z-index: 3;
-      animation: scaleIn 0.15s ease;
-    }
-
-    /* Исправление для мобильных устройств */
-    @media (max-width: 768px) {
-      .awesomplete > ul {
-        position: fixed;
-        top: auto;
-        bottom: 0;
-        left: 0;
-        right: 0;
-        width: 100%;
-        max-height: 50vh;
-        border-radius: 0;
-        box-shadow: none;
-        border-top: 1px solid var(--c-border);
-      }
     }
 
     .awesomplete > ul > li {
       padding: 0;
-      transition: all 0.2s ease;
-      list-style: none;
-      line-height: 1.4;
-      box-sizing: border-box;
+      transition: var(--transition);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    .awesomplete > ul > li:last-child {
+      border-bottom: none;
     }
 
     .awesomplete > ul > li:hover,
     .awesomplete > ul > li[aria-selected="true"] {
       background: var(--c-link);
-      color: var(--c-bg);
-    }
-
-    .awesomplete mark {
-      background: rgba(74, 222, 128, 0.3);
-      color: inherit;
+      transform: translateX(5px);
     }
 
     .tag-item {
@@ -462,26 +448,41 @@
       justify-content: space-between;
       align-items: center;
       width: 100%;
-      padding: 8px 16px;
+      padding: 12px 25px;
+      overflow-x: hidden;
     }
 
     .tag-name {
       font-weight: 500;
       color: var(--c-text);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: 90%;
     }
 
     .awesomplete > ul > li:hover .tag-name {
       color: var(--c-bg);
     }
 
+    .no-results {
+      text-align: center;
+      color: var(--c-link);
+      font-size: 1.5rem;
+      padding: 2rem;
+      grid-column: 1 / -1;
+      opacity: 0.7;
+      font-weight: 300;
+    }
+
     @keyframes scaleIn {
       from {
         opacity: 0;
-        transform: translateY(-3px);
+        transform: scale(0.95);
       }
       to {
         opacity: 1;
-        transform: translateY(0);
+        transform: scale(1);
       }
     }
 
@@ -553,13 +554,17 @@
       .pagination {
         gap: 5px;
       }
+
+      .tag-item {
+        padding: 10px 15px;
+      }
     }
   </style>
 </head>
 <body>
   <div id="header">
     <div class="header-content">
-      <h1 id="site-title">Rule 34</h1>
+      <h1 id="site-title" onclick="resetSearch()">Rule 34</h1>
       <div class="tag-search">
         <form onsubmit="searchPosts(); return false;">
           <div class="search-container">
@@ -641,12 +646,22 @@
         updatePaginator();
       } catch (error) {
         console.error('Ошибка при получении постов:', error);
+        displayPosts([]);
       }
     }
 
     function displayPosts(posts) {
       const container = document.getElementById('postsContainer');
       container.innerHTML = '';
+      
+      if (posts.length === 0) {
+        const noResults = document.createElement('div');
+        noResults.className = 'no-results';
+        noResults.textContent = 'Ничего не найдено. Попробуйте другие теги.';
+        container.appendChild(noResults);
+        return;
+      }
+
       posts.forEach(post => {
         const thumb = document.createElement('div');
         thumb.className = 'thumb';
@@ -756,6 +771,12 @@
       searchPosts();
     }
 
+    function resetSearch() {
+      document.getElementById('tagsInput').value = '';
+      currentPage = 0;
+      searchPosts();
+    }
+
     function changePage(direction) {
       currentPage = Math.max(0, currentPage + direction);
       searchPosts();
@@ -847,33 +868,29 @@
           minChars: 2,
           maxItems: 30,
           autoFirst: true,
-          mobile: true,
-          replace: function(suggestion) {
-            const currentValue = this.input.value;
-            const words = currentValue.split(' ');
-            words.pop();
-            words.push(suggestion.value);
-            this.input.value = words.join(' ').replace(/\s+/g, ' ').trim() + ' ';
-            this.input.focus();
+          filter: function(text, input) {
+            return Awesomplete.FILTER_CONTAINS(text.value, input.match(/[^ ]*$/)[0]);
           },
-          filter: function(suggestion, inputVal) {
-            const words = inputVal.split(' ');
-            const lastWord = words[words.length - 1].toLowerCase();
-            return lastWord.length >= 2 && suggestion.value.toLowerCase().includes(lastWord);
-          },
-          item: function(suggestion, inputVal) {
+          item: function(item) {
             const li = document.createElement('li');
-            const words = inputVal.split(' ');
-            const lastWord = words[words.length - 1].toLowerCase();
-            const regex = new RegExp(lastWord, 'gi');
-            const highlightedName = suggestion.label.replace(regex, '<mark>$&</mark>');
             li.innerHTML = `
               <div class="tag-item">
-                <span class="tag-name">${highlightedName}</span>
-                <!-- Убрали tag-count -->
+                <span class="tag-name">${item.value}</span>
               </div>
             `;
+            li.dataset.value = item.value;
             return li;
+          },
+          replace: function(suggestion) {
+            const cursorPos = this.input.selectionStart;
+            const textBeforeCursor = this.input.value.slice(0, cursorPos);
+            const words = textBeforeCursor.split(/\s+/);
+            words.pop();
+            words.push(suggestion.value);
+            this.input.value = words.join(' ') + ' ' + this.input.value.slice(cursorPos);
+            this.input.focus();
+            this.input.selectionStart = this.input.selectionEnd = this.input.value.length;
+            this.evaluate();
           }
         });
 
