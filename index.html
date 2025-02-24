@@ -74,19 +74,19 @@
 
     #tagsInput {
       width: 100%;
-      padding: 1.25rem 2rem;
-      font-size: 1.1rem;
+      padding: 1.25rem 2rem; /* Как в примере */
+      font-size: 1.1rem; /* Как в примере */
       background: var(--c-bg);
       border: 1px solid var(--c-border);
       color: var(--c-text);
-      border-radius: 6px; /* Вернули квадратный вид */
+      border-radius: 50px; /* Закруглённые края как в примере */
       outline: none;
       transition: var(--transition);
     }
 
     #tagsInput:focus {
       border-color: var(--c-link);
-      box-shadow: 0 10px 20px -5px rgba(74, 222, 128, 0.15);
+      box-shadow: 0 10px 20px -5px rgba(74, 222, 128, 0.15); /* Эффект фокуса как в примере */
     }
 
     .search-button {
@@ -410,7 +410,7 @@
     .awesomplete > ul {
       background: var(--c-bg-alt);
       border: none;
-      border-radius: 12px;
+      border-radius: 12px; /* Как в примере */
       box-shadow: var(--shadow);
       margin-top: 10px;
       padding: 0;
@@ -428,7 +428,7 @@
     .awesomplete > ul > li {
       padding: 0;
       transition: var(--transition);
-      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05); /* Адаптировано под тёмную тему */
     }
 
     .awesomplete > ul > li:last-child {
@@ -438,7 +438,7 @@
     .awesomplete > ul > li:hover,
     .awesomplete > ul > li[aria-selected="true"] {
       background: var(--c-link);
-      transform: translateX(5px);
+      transform: translateX(5px); /* Как в примере */
     }
 
     .tag-item {
@@ -446,17 +446,12 @@
       justify-content: space-between;
       align-items: center;
       width: 100%;
-      padding: 12px 25px;
-      overflow-x: hidden; /* Убираем горизонтальный скролл */
+      padding: 12px 25px; /* Как в примере */
     }
 
     .tag-name {
       font-weight: 500;
       color: var(--c-text);
-      white-space: nowrap; /* Предотвращаем перенос текста */
-      overflow: hidden; /* Скрываем лишний текст */
-      text-overflow: ellipsis; /* Добавляем многоточие */
-      max-width: 100%; /* Ограничиваем ширину */
     }
 
     .awesomplete > ul > li:hover .tag-name {
@@ -466,7 +461,7 @@
     @keyframes scaleIn {
       from {
         opacity: 0;
-        transform: scale(0.95);
+        transform: scale(0.95); /* Как в примере */
       }
       to {
         opacity: 1;
@@ -543,13 +538,14 @@
         gap: 5px;
       }
 
+      /* Адаптация поисковой строки для мобильных */
       #tagsInput {
-        padding: 1rem 1.5rem;
-        font-size: 1rem;
+        padding: 1rem 1.5rem; /* Как в примере */
+        font-size: 1rem; /* Как в примере */
       }
 
       .tag-item {
-        padding: 10px 15px;
+        padding: 10px 15px; /* Как в примере */
       }
     }
   </style>
@@ -842,24 +838,24 @@
         const input = document.getElementById('tagsInput');
         awesomeplete = new Awesomplete(input, {
           list: tagData,
-          minChars: 1,
+          minChars: 1, /* Как в примере */
           maxItems: 30,
           autoFirst: true,
           filter: function(text, input) {
-            return Awesomplete.FILTER_STARTSWITH(text.value, input);
+            return Awesomplete.FILTER_STARTSWITH(text.value, input); /* Как в примере */
           },
           item: function(item) {
             const li = document.createElement('li');
             li.innerHTML = `
               <div class="tag-item">
-                <span class="tag-name">${item.value}</span>
+                <span class="tag-name">${item.value}</span> /* Без подсветки, как в примере */
               </div>
             `;
             li.dataset.value = item.value;
             return li;
           },
           sort: function(a, b) {
-            return tagData.indexOf(b) - tagData.indexOf(a);
+            return tagData.indexOf(b) - tagData.indexOf(a); /* Как в примере */
           },
           replace: function(suggestion) {
             const currentValue = this.input.value;
@@ -867,7 +863,7 @@
             words.push(suggestion.value);
             this.input.value = words.join(' ').replace(/\s+/g, ' ').trim();
             this.input.focus();
-            searchPosts();
+            searchPosts(); /* Адаптация под ваш функционал */
           }
         });
 
