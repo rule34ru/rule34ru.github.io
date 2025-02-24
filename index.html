@@ -79,7 +79,7 @@
       background: var(--c-bg);
       border: 1px solid var(--c-border);
       color: var(--c-text);
-      border-radius: 6px;
+      border-radius: 6px; /* Вернули квадратный вид */
       outline: none;
       transition: var(--transition);
     }
@@ -447,16 +447,16 @@
       align-items: center;
       width: 100%;
       padding: 12px 25px;
-      overflow-x: hidden;
+      overflow-x: hidden; /* Убираем горизонтальный скролл */
     }
 
     .tag-name {
       font-weight: 500;
       color: var(--c-text);
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      max-width: 100%;
+      white-space: nowrap; /* Предотвращаем перенос текста */
+      overflow: hidden; /* Скрываем лишний текст */
+      text-overflow: ellipsis; /* Добавляем многоточие */
+      max-width: 100%; /* Ограничиваем ширину */
     }
 
     .awesomplete > ul > li:hover .tag-name {
@@ -841,35 +841,35 @@
 
         const input = document.getElementById('tagsInput');
         awesomeplete = new Awesomplete(input, {
-		  list: tagData,
-		  minChars: 2,
-		  maxItems: 30,
-		  autoFirst: true,
-		  filter: function(text, input) {
-			return Awesomplete.FILTER_CONTAINS(text.value, input.match(/[^ ]*$/)[0]);
-		  },
-		  item: function(item) {
-			const li = document.createElement('li');
-			li.innerHTML = `
-			  <div class="tag-item">
-				<span class="tag-name">${item.value}</span>
-			  </div>
-			`;
-			li.dataset.value = item.value;
-			return li;
-		  },
-		  replace: function(suggestion) {
-			const cursorPos = this.input.selectionStart;
-			const textBeforeCursor = this.input.value.slice(0, cursorPos);
-			const words = textBeforeCursor.split(/\s+/);
-			words.pop();
-			words.push(suggestion.value);
-			this.input.value = words.join(' ') + ' ' + this.input.value.slice(cursorPos);
-			this.input.focus();
-			this.input.selectionStart = this.input.selectionEnd = this.input.value.length;
-			this.evaluate();
-		  }
-		});
+          list: tagData,
+          minChars: 1,
+          maxItems: 30,
+          autoFirst: true,
+          filter: function(text, input) {
+            return Awesomplete.FILTER_STARTSWITH(text.value, input);
+          },
+          item: function(item) {
+            const li = document.createElement('li');
+            li.innerHTML = `
+              <div class="tag-item">
+                <span class="tag-name">${item.value}</span>
+              </div>
+            `;
+            li.dataset.value = item.value;
+            return li;
+          },
+          sort: function(a, b) {
+            return tagData.indexOf(b) - tagData.indexOf(a);
+          },
+          replace: function(suggestion) {
+            const currentValue = this.input.value;
+            const words = currentValue.split(' ').filter(t => t);
+            words.push(suggestion.value);
+            this.input.value = words.join(' ').replace(/\s+/g, ' ').trim();
+            this.input.focus();
+            searchPosts();
+          }
+        });
 
         input.addEventListener('awesomplete-selectcomplete', () => {
           searchPosts();
@@ -899,4 +899,4 @@
     });
   </script>
 </body>
-</html> 
+</html>
