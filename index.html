@@ -58,7 +58,6 @@
       margin: 0;
       white-space: nowrap;
       flex-shrink: 0;
-      cursor: pointer;
     }
 
     .tag-search {
@@ -75,8 +74,8 @@
 
     #tagsInput {
       width: 100%;
-      padding: 1rem 1.5rem;
-      font-size: 1rem;
+      padding: 1.25rem 2rem;
+      font-size: 1.1rem;
       background: var(--c-bg);
       border: 1px solid var(--c-border);
       color: var(--c-text);
@@ -419,7 +418,6 @@
       animation: scaleIn 0.15s ease;
       max-height: 400px;
       overflow-y: auto;
-      overflow-x: hidden;
       position: absolute;
       width: 100%;
       left: 0;
@@ -458,21 +456,11 @@
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
-      max-width: 90%;
+      max-width: 100%;
     }
 
     .awesomplete > ul > li:hover .tag-name {
       color: var(--c-bg);
-    }
-
-    .no-results {
-      text-align: center;
-      color: var(--c-link);
-      font-size: 1.5rem;
-      padding: 2rem;
-      grid-column: 1 / -1;
-      opacity: 0.7;
-      font-weight: 300;
     }
 
     @keyframes scaleIn {
@@ -555,6 +543,11 @@
         gap: 5px;
       }
 
+      #tagsInput {
+        padding: 1rem 1.5rem;
+        font-size: 1rem;
+      }
+
       .tag-item {
         padding: 10px 15px;
       }
@@ -564,7 +557,7 @@
 <body>
   <div id="header">
     <div class="header-content">
-      <h1 id="site-title" onclick="resetSearch()">Rule 34</h1>
+      <h1 id="site-title">Rule 34</h1>
       <div class="tag-search">
         <form onsubmit="searchPosts(); return false;">
           <div class="search-container">
@@ -646,22 +639,12 @@
         updatePaginator();
       } catch (error) {
         console.error('Ошибка при получении постов:', error);
-        displayPosts([]);
       }
     }
 
     function displayPosts(posts) {
       const container = document.getElementById('postsContainer');
       container.innerHTML = '';
-      
-      if (posts.length === 0) {
-        const noResults = document.createElement('div');
-        noResults.className = 'no-results';
-        noResults.textContent = 'Ничего не найдено. Попробуйте другие теги.';
-        container.appendChild(noResults);
-        return;
-      }
-
       posts.forEach(post => {
         const thumb = document.createElement('div');
         thumb.className = 'thumb';
@@ -771,12 +754,6 @@
       searchPosts();
     }
 
-    function resetSearch() {
-      document.getElementById('tagsInput').value = '';
-      currentPage = 0;
-      searchPosts();
-    }
-
     function changePage(direction) {
       currentPage = Math.max(0, currentPage + direction);
       searchPosts();
@@ -864,35 +841,35 @@
 
         const input = document.getElementById('tagsInput');
         awesomeplete = new Awesomplete(input, {
-          list: tagData,
-          minChars: 2,
-          maxItems: 30,
-          autoFirst: true,
-          filter: function(text, input) {
-            return Awesomplete.FILTER_CONTAINS(text.value, input.match(/[^ ]*$/)[0]);
-          },
-          item: function(item) {
-            const li = document.createElement('li');
-            li.innerHTML = `
-              <div class="tag-item">
-                <span class="tag-name">${item.value}</span>
-              </div>
-            `;
-            li.dataset.value = item.value;
-            return li;
-          },
-          replace: function(suggestion) {
-            const cursorPos = this.input.selectionStart;
-            const textBeforeCursor = this.input.value.slice(0, cursorPos);
-            const words = textBeforeCursor.split(/\s+/);
-            words.pop();
-            words.push(suggestion.value);
-            this.input.value = words.join(' ') + ' ' + this.input.value.slice(cursorPos);
-            this.input.focus();
-            this.input.selectionStart = this.input.selectionEnd = this.input.value.length;
-            this.evaluate();
-          }
-        });
+		  list: tagData,
+		  minChars: 2,
+		  maxItems: 30,
+		  autoFirst: true,
+		  filter: function(text, input) {
+			return Awesomplete.FILTER_CONTAINS(text.value, input.match(/[^ ]*$/)[0]);
+		  },
+		  item: function(item) {
+			const li = document.createElement('li');
+			li.innerHTML = `
+			  <div class="tag-item">
+				<span class="tag-name">${item.value}</span>
+			  </div>
+			`;
+			li.dataset.value = item.value;
+			return li;
+		  },
+		  replace: function(suggestion) {
+			const cursorPos = this.input.selectionStart;
+			const textBeforeCursor = this.input.value.slice(0, cursorPos);
+			const words = textBeforeCursor.split(/\s+/);
+			words.pop();
+			words.push(suggestion.value);
+			this.input.value = words.join(' ') + ' ' + this.input.value.slice(cursorPos);
+			this.input.focus();
+			this.input.selectionStart = this.input.selectionEnd = this.input.value.length;
+			this.evaluate();
+		  }
+		});
 
         input.addEventListener('awesomplete-selectcomplete', () => {
           searchPosts();
@@ -922,4 +899,4 @@
     });
   </script>
 </body>
-</html>
+</html> 
