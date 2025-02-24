@@ -225,7 +225,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 	  minChars: 2,
 	  maxItems: 30,
 	  autoFirst: true,
-	  mobile: true,
+	  mobile: false,
 	  replace: function(text) {
 		const currentValue = this.input.value;
 		const words = currentValue.split(' ');
