@@ -6,7 +6,555 @@
   <link rel="icon" href="data:;base64,iVBORw0KGgo=">
   <title>Gallery</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/awesome-complete/1.1.0/awesomplete.min.css">
-  <link rel="stylesheet" href="style.css">
+  <style>
+    :root {
+      --c-bg: #1a1f1a;
+      --c-bg-alt: #232923;
+      --c-text: #e0e0e0;
+      --c-link: #4ade80;
+      --c-border: #374537;
+      --c-hover: #34d399;
+      --c-pastel-green: #98fb98;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Inter', system-ui, sans-serif;
+      background: var(--c-bg);
+      color: var(--c-text);
+      font-size: 14px;
+      line-height: 1.6;
+    }
+
+    #header {
+      background: var(--c-bg-alt);
+      border-bottom: 2px solid var(--c-border);
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .header-content {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 15px 30px;
+      gap: 20px;
+      flex-wrap: wrap;
+    }
+
+    #site-title {
+      color: var(--c-link);
+      font-size: 2em;
+      font-weight: 700;
+      margin: 0;
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+
+    .tag-search {
+      flex-grow: 1;
+      min-width: 250px;
+      max-width: 600px;
+      position: relative;
+    }
+
+    .search-container {
+      position: relative;
+    }
+
+    #tagsInput {
+      width: 100%;
+      padding: 15px 45px 15px 15px;
+      background: var(--c-bg);
+      border: 1px solid var(--c-border);
+      color: var(--c-text);
+      border-radius: 6px;
+      font-size: 18px;
+      transition: all 0.3s ease;
+    }
+
+    #tagsInput:focus {
+      border-color: var(--c-link);
+      box-shadow: 0 0 0 3px rgba(74, 222, 128, 0.2);
+      outline: none;
+    }
+
+    .search-button {
+      position: absolute;
+      right: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      background: none;
+      border: none;
+      cursor: pointer;
+      padding: 0;
+      width: 24px;
+      height: 24px;
+      color: var(--c-text);
+      z-index: 2;
+    }
+
+    .search-button svg {
+      width: 100%;
+      height: 100%;
+      fill: currentColor;
+    }
+
+    .search-button:hover {
+      color: var(--c-link);
+    }
+
+    .container {
+      display: flex;
+      gap: 30px;
+      padding: 30px;
+      max-width: 1800px;
+      margin: 0 auto;
+    }
+
+    .sidebar {
+      width: 280px;
+      background: var(--c-bg-alt);
+      padding: 20px;
+      border-radius: 8px;
+      height: fit-content;
+      position: sticky;
+      top: 100px;
+      transition: transform 0.3s ease;
+    }
+
+    .sidebar-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 15px;
+    }
+
+    .close-sidebar {
+      background: none;
+      border: none;
+      color: var(--c-text);
+      cursor: pointer;
+      font-size: 24px;
+      padding: 0 5px;
+      line-height: 1;
+    }
+
+    .close-sidebar:hover {
+      color: var(--c-link);
+    }
+
+    .sidebar h5 {
+      color: var(--c-link);
+      margin: 0;
+      font-size: 1.1em;
+    }
+
+    .sidebar ul {
+      list-style: none;
+    }
+
+    .sidebar li {
+      margin: 10px 0;
+    }
+
+    .sidebar a {
+      color: var(--c-text);
+      text-decoration: none;
+      transition: color 0.3s;
+    }
+
+    .sidebar a:hover {
+      color: var(--c-link);
+    }
+
+    .image-list {
+      flex: 1;
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+      gap: 12px;
+      align-items: start;
+    }
+
+    .thumb {
+      background: var(--c-bg-alt);
+      border-radius: 8px;
+      overflow: hidden;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      border: 2px solid transparent;
+      max-height: 240px;
+      position: relative;
+    }
+
+    .thumb[data-media-type="video"],
+    .thumb[data-media-type="gif"] {
+      border-color: var(--c-pastel-green);
+    }
+
+    .thumb[data-aspect-ratio="tall"] {
+      max-height: 320px;
+    }
+
+    .thumb:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 8px 15px rgba(0, 0, 0, 0.2);
+    }
+
+    .thumb img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: top center;
+      cursor: pointer;
+      transition: transform 0.3s ease;
+    }
+
+    .thumb[data-aspect-ratio="tall"] img {
+      object-fit: contain;
+      object-position: top;
+    }
+
+    .thumb:hover img {
+      transform: scale(1.05);
+    }
+
+    .media-view {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.9);
+      display: none;
+      justify-content: center;
+      align-items: center;
+      z-index: 1000;
+      padding: 20px;
+    }
+
+    .media-view.active {
+      display: flex;
+    }
+
+    .media-content {
+      max-width: 90%;
+      max-height: 90vh;
+      position: relative;
+      background: var(--c-bg-alt);
+      border-radius: 12px;
+      overflow: auto;
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 20px;
+    }
+
+    .media-content img,
+    .media-content video {
+      max-width: 100%;
+      max-height: 80vh;
+      width: auto;
+      height: auto;
+      object-fit: contain;
+      margin: 0 auto;
+      display: block;
+    }
+
+    .media-info {
+      padding: 20px;
+      background: var(--c-bg-alt);
+      width: 100%;
+    }
+
+    .tag-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin: 10px 0;
+      justify-content: flex-start;
+      max-width: 100%;
+    }
+
+    .tag-list.collapsed .tag:nth-child(n+11) {
+      display: none;
+    }
+
+    .tag {
+      background: var(--c-bg);
+      color: var(--c-text);
+      padding: 4px 10px;
+      border-radius: 4px;
+      font-size: 12px;
+      border: none;
+      cursor: pointer;
+      transition: all 0.3s;
+      white-space: nowrap;
+      max-width: 100%;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .tag:hover {
+      background: var(--c-link);
+      color: var(--c-bg);
+    }
+
+    .close-btn {
+      position: absolute;
+      top: 15px;
+      right: 15px;
+      background: none;
+      border: none;
+      color: var(--c-text);
+      font-size: 24px;
+      cursor: pointer;
+      z-index: 1001;
+    }
+
+    .comments-section {
+      padding: 20px;
+      background: var(--c-bg);
+      border-radius: 8px;
+      margin-top: 15px;
+    }
+
+    .comment {
+      padding: 10px;
+      border-bottom: 1px solid var(--c-border);
+      word-wrap: break-word;
+      overflow-wrap: anywhere;
+      hyphens: auto;
+      white-space: pre-wrap;
+      max-width: 100%;
+    }
+
+    #paginator {
+      margin: 20px 0;
+      text-align: center;
+    }
+
+    .pagination {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    .pagination a,
+    .pagination span {
+      padding: 8px 12px;
+      border: 1px solid var(--c-border);
+      border-radius: 6px;
+      text-decoration: none;
+      color: var(--c-text);
+      transition: all 0.3s;
+    }
+
+    .pagination a:hover {
+      background: var(--c-link);
+      border-color: var(--c-link);
+      color: var(--c-bg);
+    }
+
+    #currentPage {
+      border: 1px solid var(--c-border);
+      border-radius: 6px;
+      outline: none;
+      transition: all 0.3s;
+      cursor: text;
+      background: var(--c-bg);
+      min-width: 40px;
+      padding: 8px 12px;
+      display: inline-block;
+    }
+
+    #currentPage:focus {
+      border-color: var(--c-link);
+      box-shadow: 0 0 0 2px rgba(74, 222, 128, 0.2);
+    }
+
+    .show-more-tags {
+      background: var(--c-link);
+      color: var(--c-bg);
+      border: none;
+      padding: 6px 12px;
+      border-radius: 4px;
+      cursor: pointer;
+      margin-top: 8px;
+      font-size: 12px;
+      align-self: center;
+    }
+
+    .show-more-tags:hover {
+      background: var(--c-hover);
+    }
+
+    .awesomplete {
+      width: 100%;
+      position: relative;
+    }
+
+    .awesomplete > ul {
+      background: var(--c-bg-alt);
+      border: 1px solid var(--c-border);
+      border-top: none;
+      border-radius: 0 0 6px 6px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+      margin: 0;
+      padding: 8px 0;
+      max-height: 300px;
+      overflow-y: auto;
+      position: absolute;
+      width: calc(100% + 2px);
+      left: -1px;
+      top: 100%;
+      z-index: 3;
+      animation: scaleIn 0.15s ease;
+    }
+
+    .awesomplete > ul > li {
+      padding: 0;
+      transition: all 0.2s ease;
+      list-style: none;
+      line-height: 1.4;
+      box-sizing: border-box;
+    }
+
+    .awesomplete > ul > li:hover,
+    .awesomplete > ul > li[aria-selected="true"] {
+      background: var(--c-link);
+      color: var(--c-bg);
+    }
+
+    .awesomplete mark {
+      background: rgba(74, 222, 128, 0.3);
+      color: inherit;
+    }
+
+    .tag-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      width: 100%;
+      padding: 8px 16px;
+    }
+
+    .tag-name {
+      font-weight: 500;
+      color: var(--c-text);
+    }
+
+    .tag-count {
+      background: rgba(74, 222, 128, 0.1);
+      color: var(--c-link);
+      padding: 4px 8px;
+      border-radius: 4px;
+      font-size: 0.9em;
+      font-weight: 500;
+      min-width: 60px;
+      text-align: center;
+    }
+
+    .awesomplete > ul > li:hover .tag-name,
+    .awesomplete > ul > li:hover .tag-count {
+      color: var(--c-bg);
+    }
+
+    .awesomplete > ul > li:hover .tag-count {
+      background: rgba(255, 255, 255, 0.15);
+    }
+
+    @keyframes scaleIn {
+      from {
+        opacity: 0;
+        transform: translateY(-3px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .awesomplete .visually-hidden,
+    .awesomplete [aria-selected="false"]:empty {
+      display: none !important;
+    }
+
+    @media (max-width: 768px) {
+      .container {
+        flex-direction: column;
+        padding: 15px;
+      }
+      
+      .header-content {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 10px;
+        padding: 15px;
+      }
+      
+      #site-title {
+        font-size: 1.5em;
+        text-align: center;
+      }
+      
+      .tag-search {
+        width: 100%;
+        max-width: 100%;
+      }
+      
+      .sidebar {
+        width: 100%;
+        position: static;
+      }
+
+      .image-list {
+        grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+      }
+
+      .thumb {
+        max-height: 200px;
+      }
+
+      .media-content {
+        width: 100%;
+        padding: 10px;
+      }
+
+      .media-content img,
+      .media-content video {
+        max-height: 60vh;
+      }
+
+      .media-info {
+        padding: 10px;
+        font-size: 0.9em;
+      }
+
+      #currentPage {
+        padding: 6px 10px;
+        min-width: 35px;
+      }
+
+      .tag-list {
+        justify-content: center;
+      }
+
+      .pagination {
+        gap: 5px;
+      }
+    }
+  </style>
 </head>
 <body>
   <div id="header">
@@ -19,8 +567,7 @@
               type="text" 
               id="tagsInput" 
               placeholder="Поиск тегов..."
-              autocomplete="new-password"
-              inputmode="search"
+              autocomplete="off"
               aria-label="Поиск по тегам"
             >
             <button type="submit" class="search-button">
@@ -53,14 +600,14 @@
 
   <div id="paginator">
     <div class="pagination">
-      <a href="#" onclick="changePage(-1)">&lt;</a>
+      <a href="#" onclick="changePage(-1)"><</a>
       <span id="currentPage" 
             contenteditable="true"
             onkeydown="handlePageInput(event)"
             onblur="updatePageFromInput()"
             role="textbox"
             aria-label="Текущая страница"></span>
-      <a href="#" onclick="changePage(1)">&gt;</a>
+      <a href="#" onclick="changePage(1)">></a>
     </div>
   </div>
 
@@ -70,6 +617,292 @@
   </div>
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/awesomplete/1.1.5/awesomplete.min.js"></script>
-  <script src="script.js"></script>
+  <script>
+    let currentPage = 0;
+    const postsPerPage = 42;
+    let awesomeplete;
+
+    function getMediaType(post) {
+      const url = post.file_url.toLowerCase();
+      const extension = url.split('.').pop().split(/[#?]/)[0];
+      return extension === 'gif' ? 'gif' : 
+             ['mp4','webm','mov','avi','wmv','mkv','flv','gifv'].includes(extension) ? 'video' : 'image';
+    }
+
+    async function searchPosts(tag = null) {
+      const tags = tag || document.getElementById('tagsInput').value;
+      const url = `https://api.rule34.xxx/index.php?page=dapi&s=post&q=index&json=1&tags=${encodeURIComponent(tags)}&pid=${currentPage}`;
+      
+      try {
+        const response = await fetch(url);
+        if (!response.ok) throw new Error('Ошибка сети');
+        const posts = await response.json();
+        displayPosts(posts);
+        updatePaginator();
+      } catch (error) {
+        console.error('Ошибка при получении постов:', error);
+      }
+    }
+
+    function displayPosts(posts) {
+      const container = document.getElementById('postsContainer');
+      container.innerHTML = '';
+      posts.forEach(post => {
+        const thumb = document.createElement('div');
+        thumb.className = 'thumb';
+        
+        const mediaType = getMediaType(post);
+        thumb.dataset.mediaType = mediaType;
+
+        const aspectRatio = post.width / post.height;
+        thumb.dataset.aspectRatio = aspectRatio < 0.75 ? 'tall' : 
+                                  aspectRatio > 1.5 ? 'wide' : 'normal';
+
+        const img = document.createElement('img');
+        img.src = post.preview_url;
+        img.alt = 'Preview';
+        img.loading = 'lazy';
+        img.style.aspectRatio = `${post.width}/${post.height}`;
+        img.onclick = () => openMediaView(post);
+        
+        thumb.appendChild(img);
+        container.appendChild(thumb);
+      });
+    }
+
+    async function openMediaView(post) {
+      document.body.style.overflow = 'hidden';
+      const mediaView = document.getElementById('mediaView');
+      const mediaContent = document.getElementById('mediaContent');
+      
+      const mediaType = getMediaType(post);
+      const aspectRatio = post.width / post.height;
+
+      const mediaElement = mediaType === 'gif' 
+        ? `<img src="${post.file_url}" alt="Full size" class="gif-media">`
+        : mediaType === 'video'
+        ? `<video controls><source src="${post.file_url}" type="video/mp4"></video>`
+        : `<img src="${post.file_url}" alt="Full size">`;
+
+      const comments = await fetchComments(post.id);
+      const tags = post.tags.split(' ');
+
+      mediaContent.innerHTML = `
+        ${mediaElement}
+        <div class="media-info">
+          <div class="tag-list collapsed">
+            ${tags.map(tag => `<button class="tag" onclick="addTagToSearch('${tag}')">${tag}</button>`).join('')}
+            ${tags.length > 10 ? 
+              `<button class="show-more-tags" onclick="expandTags(this)">
+                Показать ещё (${tags.length - 10})
+              </button>` : ''}
+          </div>
+          <div class="comments-section">
+            <h4>Комментарии:</h4>
+            ${comments.length ? 
+              comments.map(c => `
+                <div class="comment">
+                  <strong>${c.owner}:</strong> ${c.body}
+                </div>
+              `).join('') : '<p>Нет комментариев</p>'}
+          </div>
+        </div>
+      `;
+
+      mediaView.classList.add('active');
+      history.pushState({ mediaViewOpen: true }, '');
+    }
+
+    function closeMediaView() {
+      const mediaContent = document.getElementById('mediaContent');
+      const videos = mediaContent.getElementsByTagName('video');
+      Array.from(videos).forEach(video => {
+        video.pause();
+        video.currentTime = 0;
+      });
+      document.body.style.overflow = '';
+      document.getElementById('mediaView').classList.remove('active');
+      if (window.history.state?.mediaViewOpen) {
+        history.back();
+      }
+    }
+
+    async function fetchComments(postId) {
+      const url = `https://api.rule34.xxx/index.php?page=dapi&s=comment&q=index&post_id=${postId}`;
+      try {
+        const response = await fetch(url);
+        if (!response.ok) throw new Error('Ошибка сети при загрузке комментариев');
+        const text = await response.text();
+        const parser = new DOMParser();
+        const xmlDoc = parser.parseFromString(text, "application/xml");
+        const commentElements = xmlDoc.getElementsByTagName('comment');
+        return Array.from(commentElements).map(el => ({
+          owner: el.getAttribute('creator') || 'Анон',
+          body: el.getAttribute('body') || ''
+        }));
+      } catch (error) {
+        console.error('Ошибка при загрузке комментариев:', error);
+        return [];
+      }
+    }
+
+    function addTagToSearch(tag) {
+      const input = document.getElementById('tagsInput');
+      const currentTags = input.value.split(' ').filter(t => t);
+      currentTags.push(tag);
+      input.value = currentTags.join(' ');
+      currentPage = 0;
+      closeMediaView();
+      searchPosts();
+    }
+
+    function changePage(direction) {
+      currentPage = Math.max(0, currentPage + direction);
+      searchPosts();
+    }
+
+    function updatePaginator() {
+      const pageElement = document.getElementById('currentPage');
+      pageElement.textContent = currentPage + 1;
+    }
+
+    function handlePageInput(event) {
+      if (event.key === 'Enter') {
+        event.preventDefault();
+        updatePageFromInput();
+      }
+    }
+
+    function updatePageFromInput() {
+      const pageElement = document.getElementById('currentPage');
+      const newPage = parseInt(pageElement.textContent) - 1;
+      
+      if (!isNaN(newPage) && newPage >= 0) {
+        currentPage = newPage;
+        searchPosts();
+      } else {
+        pageElement.textContent = currentPage + 1;
+      }
+    }
+
+    function expandTags(button) {
+      const tagList = button.parentElement;
+      tagList.classList.remove('collapsed');
+      button.remove();
+    }
+
+    function toggleSidebar() {
+      const sidebar = document.getElementById('sidebar');
+      const isHidden = sidebar.style.display === 'none';
+      sidebar.style.display = isHidden ? 'block' : 'none';
+      localStorage.setItem('sidebarHidden', !isHidden);
+    }
+
+    document.addEventListener('DOMContentLoaded', async () => {
+      try {
+        if (localStorage.getItem('sidebarHidden') === 'true') {
+          document.getElementById('sidebar').style.display = 'none';
+        }
+
+        let currentFile = 1;
+        const allTags = [];
+        const MAX_TAG_FILES = 20;
+
+        while(currentFile <= MAX_TAG_FILES) {
+          try {
+            const response = await fetch(`tags8/tags_${currentFile}.json`);
+            
+            if (!response.ok) {
+              if (response.status === 404) break;
+              throw new Error(`HTTP error! status: ${response.status}`);
+            }
+
+            const data = await response.json();
+            console.log(`Загружен файл tags_${currentFile}.json`);
+
+            const validTags = data.filter(item => 
+              item?.name && item?.count && !isNaN(Number(item.count))
+            );
+            
+            allTags.push(...validTags);
+            currentFile++;
+          } catch(e) {
+            console.error(`Ошибка загрузки tags_${currentFile}.json:`, e);
+            break;
+          }
+        }
+
+        const sortedTags = allTags
+          .map(tag => ({
+            name: tag.name.trim(),
+            count: Number(tag.count)
+          }))
+          .sort((a, b) => b.count - a.count);
+
+        const tagData = sortedTags.map(t => ({ label: t.name, value: t.name, count: t.count }));
+
+        const input = document.getElementById('tagsInput');
+        awesomeplete = new Awesomplete(input, {
+          list: tagData,
+          minChars: 2,
+          maxItems: 30,
+          autoFirst: true,
+          mobile: true,
+          replace: function(suggestion) {
+            const currentValue = this.input.value;
+            const words = currentValue.split(' ');
+            words.pop();
+            words.push(suggestion.value);
+            this.input.value = words.join(' ').replace(/\s+/g, ' ').trim() + ' ';
+            this.input.focus();
+          },
+          filter: function(suggestion, inputVal) {
+            const words = inputVal.split(' ');
+            const lastWord = words[words.length - 1].toLowerCase();
+            return lastWord.length >= 2 && suggestion.value.toLowerCase().includes(lastWord);
+          },
+          item: function(suggestion, inputVal) {
+            const li = document.createElement('li');
+            const words = inputVal.split(' ');
+            const lastWord = words[words.length - 1].toLowerCase();
+            const regex = new RegExp(lastWord, 'gi');
+            const highlightedName = suggestion.label.replace(regex, '<mark>$&</mark>');
+            li.innerHTML = `
+              <div class="tag-item">
+                <span class="tag-name">${highlightedName}</span>
+                <span class="tag-count">${suggestion.count}</span>
+              </div>
+            `;
+            return li;
+          }
+        });
+
+        input.addEventListener('awesomplete-selectcomplete', () => {
+          searchPosts();
+        });
+
+        searchPosts();
+
+      } catch (error) {
+        console.error('Глобальная ошибка:', error);
+      }
+    });
+
+    document.getElementById('mediaView').addEventListener('click', function(e) {
+      if (e.target === this) closeMediaView();
+    });
+
+    document.addEventListener('keydown', function(e) {
+      if (e.key === 'Escape' && document.getElementById('mediaView').classList.contains('active')) {
+        closeMediaView();
+      }
+    });
+
+    window.addEventListener('popstate', function() {
+      if (document.getElementById('mediaView').classList.contains('active')) {
+        closeMediaView();
+      }
+    });
+  </script>
 </body>
 </html>
