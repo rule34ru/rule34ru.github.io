@@ -613,7 +613,24 @@
     let isMobile = false;
     let tagsList = [];
 
-    // Определение мобильного устройства
+    function replaceSearchWithTag(tag) {
+      const input = document.getElementById('tagsInput');
+      input.value = tag;
+      currentPage = 0;
+      closeMediaView();
+      searchPosts();
+    }
+
+    function addTagToSearch(tag) {
+      const input = document.getElementById('tagsInput');
+      const currentTags = input.value.split(' ').filter(t => t);
+      currentTags.push(tag);
+      input.value = currentTags.join(' ');
+      currentPage = 0;
+      closeMediaView();
+      searchPosts();
+    }
+
     function detectMobile() {
       return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || 
              (navigator.maxTouchPoints && navigator.maxTouchPoints > 2);
@@ -693,7 +710,7 @@
         ${mediaElement}
         <div class="media-info">
           <div class="tag-list collapsed">
-            ${tags.map(tag => `<button class="tag" onclick="addTagToSearch('${tag}')">${tag}</button>`).join('')}
+            ${tags.map(tag => `<button class="tag" onclick="replaceSearchWithTag('${tag}')">${tag}</button>`).join('')}
             ${tags.length > 10 ? 
               `<button class="show-more-tags" onclick="expandTags(this)">
                 Показать ещё (${tags.length - 10})
@@ -748,16 +765,6 @@
       }
     }
 
-    function addTagToSearch(tag) {
-      const input = document.getElementById('tagsInput');
-      const currentTags = input.value.split(' ').filter(t => t);
-      currentTags.push(tag);
-      input.value = currentTags.join(' ');
-      currentPage = 0;
-      closeMediaView();
-      searchPosts();
-    }
-
     function changePage(direction) {
       currentPage = Math.max(0, currentPage + direction);
       searchPosts();
@@ -800,13 +807,11 @@
       localStorage.setItem('sidebarHidden', !isHidden);
     }
 
-    // Расширенная инициализация автозаполнения
     function setupAwesomplete(input, tagsList) {
       if (awesomeplete) {
         awesomeplete.destroy();
       }
-      
-      // Преобразуем список простых строк в объекты для лучшей работы с ними
+
       const tagData = tagsList.map(tag => ({ label: tag, value: tag }));
       
       awesomeplete = new Awesomplete(input, {
@@ -815,9 +820,9 @@
         maxItems: 30,
         autoFirst: true,
         filter: function(text, input) {
-          // Извлекаем только последнее слово из строки ввода
-          const lastWord = input.match(/[^ ]*$/)[0];
-          return Awesomplete.FILTER_CONTAINS(text.value, lastWord);
+          const lastWord = input.match(/[^ ]*$/)[0].toLowerCase();
+          const tagLower = text.value.toLowerCase();
+          return tagLower.includes(lastWord) && tagLower !== lastWord;
         },
         item: function(item) {
           const li = document.createElement('li');
@@ -830,34 +835,20 @@
           return li;
         },
         replace: function(suggestion) {
-          // Сохраняем текущую позицию курсора
           const cursorPos = this.input.selectionStart;
-          
-          // Получаем текст до курсора
           const textBeforeCursor = this.input.value.slice(0, cursorPos);
-          
-          // Разбиваем на слова
           const words = textBeforeCursor.split(/\s+/);
-          
-          // Заменяем последнее слово предложенным тегом
           words.pop();
           words.push(suggestion.value);
-          
-          // Собираем новое значение с сохранением текста после курсора
           const newValue = words.join(' ') + ' ' + this.input.value.slice(cursorPos);
           this.input.value = newValue;
-          
-          // Возвращаем фокус в поле и устанавливаем курсор в конец
           this.input.focus();
           this.input.selectionStart = this.input.selectionEnd = newValue.length;
-          
-          // Перезапускаем оценку для новых предложений
           this.evaluate();
         }
       });
       
       input.addEventListener('awesomplete-selectcomplete', () => {
-        // Поиск постов происходит при выборе тега из списка
         searchPosts();
       });
     }
@@ -912,48 +903,38 @@
         const input = document.getElementById('tagsInput');
         setupAwesomplete(input, tagsList);
 
-        // Обработчик для обновления подсказок при вводе
         input.addEventListener('input', function() {
           const words = this.value.split(' ');
           const lastWord = words[words.length - 1];
           
           if (lastWord && lastWord.length >= 1) {
-            // Фильтруем только те теги, которые начинаются с последнего слова
             const filteredTags = tagsList
               .filter(tag => tag.toLowerCase().startsWith(lastWord.toLowerCase()))
               .map(tag => ({ label: tag, value: tag }));
             
-            // Обновляем список предложений
             awesomeplete.list = filteredTags;
             awesomeplete.evaluate();
             
-            // Если есть предложения, показываем выпадающий список
             if (filteredTags.length > 0) {
               awesomeplete.open();
             }
           }
         });
 
-        // Добавляем обработчик нажатия клавиш для лучшей навигации
         input.addEventListener('keydown', function(e) {
-          // Если нажат Enter и список предложений открыт
           if (e.key === 'Enter' && awesomeplete.ul.childNodes.length > 0 && awesomeplete.opened) {
-            // Если есть выбранный элемент, используем его
             const selected = awesomeplete.ul.querySelector('.selected');
             if (selected) {
               e.preventDefault();
-              // Триггерим выбор элемента
               const event = new Event('mousedown');
               selected.dispatchEvent(event);
             } else if (awesomeplete.ul.childNodes.length > 0) {
-              // Если нет выбранного элемента, но есть предложения, выбираем первое
               e.preventDefault();
               const event = new Event('mousedown');
               awesomeplete.ul.childNodes[0].dispatchEvent(event);
             }
           }
           
-          // Если нажата Tab, выбираем первое предложение
           if (e.key === 'Tab' && awesomeplete.opened && awesomeplete.ul.childNodes.length > 0) {
             e.preventDefault();
             const event = new Event('mousedown');
@@ -961,7 +942,6 @@
           }
         });
 
-        // Сброс тегов при нажатии на "Rule 34"
         document.getElementById('site-title').addEventListener('click', function() {
           document.getElementById('tagsInput').value = '';
           currentPage = 0;
