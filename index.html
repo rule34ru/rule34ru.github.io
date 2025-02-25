@@ -8,130 +8,147 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/awesomplete/1.1.5/awesomplete.min.css">
   <style>
     :root {
-      --c-bg: #121212;
+      --c-bg: #1a1f1a;
+      --c-bg-alt: #232923;
       --c-text: #e0e0e0;
-      --c-accent: #ff4081;
-      --c-hover: #ff80ab;
-      --c-border: #424242;
-      --spacing: 10px;
+      --c-link: #4ade80;
+      --c-border: #374537;
+      --c-hover: #34d399;
+      --c-pastel-green: #98fb98;
     }
 
     * {
+      box-sizing: border-box;
       margin: 0;
       padding: 0;
-      box-sizing: border-box;
     }
 
     body {
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      font-family: 'Inter', system-ui, sans-serif;
       background: var(--c-bg);
       color: var(--c-text);
-      line-height: 1.5;
+      font-size: 14px;
+      line-height: 1.6;
     }
 
     #header {
-      padding: var(--spacing);
-      background: linear-gradient(180deg, rgba(18, 18, 18, 0.95), rgba(18, 18, 18, 0.8));
+      background: var(--c-bg-alt);
+      border-bottom: 2px solid var(--c-border);
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
       position: sticky;
       top: 0;
-      z-index: 10;
+      z-index: 100;
     }
 
     .header-content {
-      max-width: 1200px;
-      margin: 0 auto;
       display: flex;
       align-items: center;
-      gap: var(--spacing);
+      justify-content: space-between;
+      padding: 15px 30px;
+      gap: 20px;
+      flex-wrap: wrap;
     }
 
     #site-title {
-      font-size: 1.5em;
+      color: var(--c-link);
+      font-size: 2em;
+      font-weight: 700;
+      margin: 0;
+      white-space: nowrap;
+      flex-shrink: 0;
       cursor: pointer;
-      color: var(--c-accent);
-    }
-
-    #site-title:hover {
-      color: var(--c-hover);
     }
 
     .tag-search {
       flex-grow: 1;
+      min-width: 250px;
+      max-width: 600px;
+      position: relative;
     }
 
     .search-container {
-      display: flex;
-      align-items: center;
-      max-width: 600px;
-      margin: 0 auto;
+      position: relative;
     }
 
     #tagsInput {
       width: 100%;
-      padding: 8px 12px;
+      padding: 12px 40px 12px 12px;
+      background: var(--c-bg);
       border: 1px solid var(--c-border);
-      border-radius: 4px 0 0 4px;
-      background: #1e1e1e;
       color: var(--c-text);
-      font-size: 1em;
-    }
-
-    #tagsInput:focus {
-      outline: none;
-      border-color: var(--c-accent);
+      border-radius: 6px;
+      font-size: 16px;
     }
 
     .search-button {
-      padding: 8px 12px;
-      border: 1px solid var(--c-border);
-      border-left: none;
-      border-radius: 0 4px 4px 0;
-      background: var(--c-accent);
+      position: absolute;
+      right: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      background: none;
+      border: none;
       cursor: pointer;
-    }
-
-    .search-button:hover {
-      background: var(--c-hover);
+      padding: 0;
+      width: 24px;
+      height: 24px;
+      color: var(--c-text);
+      z-index: 2;
     }
 
     .search-button svg {
-      width: 20px;
-      height: 20px;
-      fill: var(--c-text);
+      width: 100%;
+      height: 100%;
+      fill: currentColor;
+    }
+
+    .search-button:hover {
+      color: var(--c-link);
     }
 
     .container {
-      max-width: 1200px;
-      margin: var(--spacing) auto;
       display: flex;
-      gap: var(--spacing);
+      gap: 30px;
+      padding: 30px;
+      max-width: 1800px;
+      margin: 0 auto;
     }
 
     .sidebar {
-      width: 250px;
-      flex-shrink: 0;
-      background: #1e1e1e;
-      padding: var(--spacing);
-      border-radius: 4px;
+      width: 280px;
+      background: var(--c-bg-alt);
+      padding: 20px;
+      border-radius: 8px;
+      height: fit-content;
+      position: sticky;
+      top: 100px;
+      transition: transform 0.3s ease;
     }
 
     .sidebar-header {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-bottom: var(--spacing);
-    }
-
-    .sidebar h5 {
-      font-size: 1.1em;
+      margin-bottom: 15px;
     }
 
     .close-sidebar {
       background: none;
       border: none;
       color: var(--c-text);
-      font-size: 1.5em;
       cursor: pointer;
+      font-size: 24px;
+      padding: 0 5px;
+      line-height: 1;
+    }
+
+    .close-sidebar:hover {
+      color: var(--c-link);
+    }
+
+    .sidebar h5 {
+      color: var(--c-link);
+      margin: 0;
+      font-size: 1.1em;
     }
 
     .sidebar ul {
@@ -139,132 +156,126 @@
     }
 
     .sidebar li {
-      margin: 5px 0;
+      margin: 10px 0;
     }
 
     .sidebar a {
-      color: var(--c-accent);
+      color: var(--c-text);
       text-decoration: none;
+      transition: color 0.3s;
     }
 
     .sidebar a:hover {
-      color: var(--c-hover);
+      color: var(--c-link);
     }
 
     .image-list {
-      flex-grow: 1;
+      flex: 1;
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-      gap: var(--spacing);
+      grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+      gap: 12px;
+      align-items: start;
     }
 
     .thumb {
-      position: relative;
+      background: var(--c-bg-alt);
+      border-radius: 8px;
       overflow: hidden;
-      border-radius: 4px;
-      background: #1e1e1e;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      border: 2px solid transparent;
+      max-height: 240px;
+      position: relative;
+    }
+
+    .thumb[data-media-type="video"],
+    .thumb[data-media-type="gif"] {
+      border-color: var(--c-pastel-green);
+    }
+
+    .thumb[data-aspect-ratio="tall"] {
+      max-height: 320px;
+    }
+
+    .thumb:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 8px 15px rgba(0, 0, 0, 0.2);
     }
 
     .thumb img {
       width: 100%;
-      height: auto;
-      display: block;
+      height: 100%;
       object-fit: cover;
+      object-position: top center;
       cursor: pointer;
-      transition: transform 0.2s;
+      transition: transform 0.3s ease;
+    }
+
+    .thumb[data-aspect-ratio="tall"] img {
+      object-fit: contain;
+      object-position: top;
     }
 
     .thumb:hover img {
       transform: scale(1.05);
     }
 
-    #paginator {
-      text-align: center;
-      padding: var(--spacing);
-    }
-
-    .pagination {
-      display: inline-flex;
-      align-items: center;
-      gap: 10px;
-    }
-
-    .pagination a {
-      color: var(--c-accent);
-      text-decoration: none;
-      padding: 5px 10px;
-      border: 1px solid var(--c-border);
-      border-radius: 4px;
-    }
-
-    .pagination a:hover {
-      background: var(--c-accent);
-      color: var(--c-text);
-    }
-
-    #currentPage {
-      min-width: 40px;
-      text-align: center;
-      padding: 5px;
-      border: 1px solid var(--c-border);
-      border-radius: 4px;
-      background: #1e1e1e;
-    }
-
-    #currentPage:focus {
-      outline: none;
-      border-color: var(--c-accent);
-    }
-
     .media-view {
-      display: none;
       position: fixed;
       top: 0;
       left: 0;
-      width: 100%;
-      height: 100%;
+      right: 0;
+      bottom: 0;
       background: rgba(0, 0, 0, 0.9);
-      z-index: 100;
-      overflow-y: auto;
+      display: none;
+      justify-content: center;
+      align-items: center;
+      z-index: 1000;
+      padding: 20px;
     }
 
     .media-view.active {
-      display: block;
-    }
-
-    .close-btn {
-      position: absolute;
-      top: 10px;
-      right: 10px;
-      background: none;
-      border: none;
-      color: var(--c-text);
-      font-size: 2em;
-      cursor: pointer;
+      display: flex;
     }
 
     .media-content {
-      max-width: 1200px;
-      margin: 20px auto;
-      padding: var(--spacing);
+      max-width: 90%;
+      max-height: 90vh;
+      position: relative;
+      background: var(--c-bg-alt);
+      border-radius: 12px;
+      overflow: auto;
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 20px;
     }
 
     .media-content img,
     .media-content video {
       max-width: 100%;
+      max-height: 80vh;
+      width: auto;
       height: auto;
-      display: block;
+      object-fit: contain;
       margin: 0 auto;
+      display: block;
     }
 
     .media-info {
-      margin-top: var(--spacing);
+      padding: 20px;
+      background: var(--c-bg-alt);
+      width: 100%;
     }
 
     .tag-list {
       display: flex;
       flex-wrap: wrap;
-      gap: 5px;
+      gap: 8px;
+      margin: 10px 0;
+      justify-content: flex-start;
+      max-width: 100%;
     }
 
     .tag-list.collapsed .tag:nth-child(n+11) {
@@ -272,64 +283,262 @@
     }
 
     .tag {
-      background: var(--c-accent);
+      background: var(--c-bg);
       color: var(--c-text);
-      padding: 2px 8px;
+      padding: 4px 10px;
       border-radius: 4px;
-      font-size: 0.9em;
-      cursor: pointer;
+      font-size: 12px;
       border: none;
+      cursor: pointer;
+      transition: all 0.3s;
+      white-space: nowrap;
+      max-width: 100%;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
 
     .tag:hover {
-      background: var(--c-hover);
+      background: var(--c-link);
+      color: var(--c-bg);
     }
 
-    .show-more-tags {
+    .close-btn {
+      position: absolute;
+      top: 15px;
+      right: 15px;
       background: none;
-      border: 1px solid var(--c-accent);
-      color: var(--c-accent);
-      padding: 2px 8px;
-      border-radius: 4px;
-      cursor: pointer;
-    }
-
-    .show-more-tags:hover {
-      background: var(--c-accent);
+      border: none;
       color: var(--c-text);
+      font-size: 24px;
+      cursor: pointer;
+      z-index: 1001;
     }
 
     .comments-section {
-      margin-top: var(--spacing);
+      padding: 20px;
+      background: var(--c-bg);
+      border-radius: 8px;
+      margin-top: 15px;
     }
 
     .comment {
-      background: #1e1e1e;
       padding: 10px;
+      border-bottom: 1px solid var(--c-border);
+      word-wrap: break-word;
+      overflow-wrap: anywhere;
+      hyphens: auto;
+      white-space: pre-wrap;
+      max-width: 100%;
+    }
+
+    #paginator {
+      margin: 20px 0;
+      text-align: center;
+    }
+
+    .pagination {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    .pagination a, .pagination span {
+      padding: 8px 12px;
+      border: 1px solid var(--c-border);
+      border-radius: 6px;
+      text-decoration: none;
+      color: var(--c-text);
+      transition: all 0.3s;
+    }
+
+    .pagination a:hover {
+      background: var(--c-link);
+      border-color: var(--c-link);
+      color: var(--c-bg);
+    }
+
+    #currentPage {
+      border: 1px solid var(--c-border);
+      border-radius: 6px;
+      outline: none;
+      transition: all 0.3s;
+      cursor: text;
+      background: var(--c-bg);
+      min-width: 40px;
+      padding: 8px 12px;
+      display: inline-block;
+    }
+
+    #currentPage:focus {
+      border-color: var(--c-link);
+      box-shadow: 0 0 0 2px rgba(74, 222, 128, 0.2);
+    }
+
+    .show-more-tags {
+      background: var(--c-link);
+      color: var(--c-bg);
+      border: none;
+      padding: 6px 12px;
       border-radius: 4px;
-      margin: 5px 0;
+      cursor: pointer;
+      margin-top: 8px;
+      font-size: 12px;
+      align-self: center;
+    }
+
+    .show-more-tags:hover {
+      background: var(--c-hover);
+    }
+
+    .awesomplete {
+      width: 100%;
+      position: relative;
+    }
+
+    .awesomplete > ul {
+      background: var(--c-bg-alt);
+      border: 1px solid var(--c-border);
+      border-top: none;
+      border-radius: 0 0 6px 6px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+      margin: 0;
+      padding: 8px 0;
+      max-height: 300px;
+      overflow-y: auto;
+      position: absolute;
+      width: calc(100% + 2px);
+      left: -1px;
+      top: 100%;
+      z-index: 3;
+      animation: scaleIn 0.15s ease;
+    }
+
+    .awesomplete > ul > li {
+      color: var(--c-text);
+      padding: 8px 16px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      list-style: none;
+      line-height: 1.4;
+      box-sizing: border-box;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .awesomplete > ul > li:hover,
+    .awesomplete > ul > li[aria-selected="true"] {
+      background: var(--c-link);
+      color: var(--c-bg);
+    }
+
+    .awesomplete mark {
+      background: rgba(74, 222, 128, 0.3);
+      color: inherit;
+    }
+
+    @keyframes scaleIn {
+      from {
+        opacity: 0;
+        transform: translateY(-3px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .awesomplete .visually-hidden,
+    .awesomplete [aria-selected="false"]:empty {
+      display: none !important;
     }
 
     @media (max-width: 768px) {
-      .header-content {
-        flex-direction: column;
-        align-items: flex-start;
-      }
-
-      .search-container {
-        width: 100%;
-      }
-
       .container {
         flex-direction: column;
+        padding: 15px;
       }
-
+      
+      .header-content {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 10px;
+        padding: 15px;
+      }
+      
+      #site-title {
+        font-size: 1.5em;
+        text-align: center;
+      }
+      
+      .tag-search {
+        width: 100%;
+        max-width: 100%;
+      }
+      
       .sidebar {
         width: 100%;
+        position: static;
       }
 
       .image-list {
-        grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+        grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+      }
+
+      .thumb {
+        max-height: 200px;
+      }
+
+      .media-content {
+        width: 100%;
+        padding: 10px;
+      }
+
+      .media-content img,
+      .media-content video {
+        max-height: 60vh;
+      }
+
+      .media-info {
+        padding: 10px;
+        font-size: 0.9em;
+      }
+
+      #currentPage {
+        padding: 6px 10px;
+        min-width: 35px;
+      }
+
+      .tag-list {
+        justify-content: center;
+      }
+
+      .pagination {
+        gap: 5px;
+      }
+      
+      .awesomplete > ul {
+        position: absolute;
+        top: 100%;
+        left: 0;
+        right: 0;
+        width: 100%;
+        max-height: 40vh;
+        border-radius: 0 0 6px 6px;
+        z-index: 1001;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+      }
+      
+      .awesomplete > ul > li {
+        padding: 12px 16px;
+        font-size: 16px;
+      }
+      
+      #tagsInput:focus {
+        border-color: var(--c-link);
+        box-shadow: 0 0 0 2px rgba(74, 222, 128, 0.2);
       }
     }
   </style>
@@ -403,418 +612,429 @@
     let awesomeplete;
     let isMobile = false;
     let tagsList = [];
+    let currentPosts = [];
 
-    function replaceSearchWithTag(tag) {
-      const input = document.getElementById('tagsInput');
-      input.value = tag;
-      currentPage = 0;
-      closeMediaView();
-      searchPosts(tag);
+    function updateURL(params = {}) {
+        const url = new URL(window.location);
+        Object.entries(params).forEach(([key, value]) => {
+            if (value !== undefined) {
+                url.searchParams.set(key, value);
+            } else {
+                url.searchParams.delete(key);
+            }
+        });
+        history.replaceState(params, '', url);
     }
 
-    function addTagToSearch(tag) {
-      const input = document.getElementById('tagsInput');
-      const currentTags = input.value.split(' ').filter(t => t);
-      currentTags.push(tag);
-      input.value = currentTags.join(' ');
-      currentPage = 0;
-      closeMediaView();
-      searchPosts(input.value);
+    function getURLParams() {
+        const params = new URLSearchParams(window.location.search);
+        return {
+            tags: params.get('tags') || '',
+            page: parseInt(params.get('page')) || 0,
+            postId: params.get('id'),
+            s: params.get('s')
+        };
     }
 
-    function detectMobile() {
-      return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || 
-             (navigator.maxTouchPoints && navigator.maxTouchPoints > 2);
-    }
-
-    function getMediaType(post) {
-      const url = post.file_url.toLowerCase();
-      const extension = url.split('.').pop().split(/[#?]/)[0];
-      return extension === 'gif' ? 'gif' : 
-             ['mp4','webm','mov','avi','wmv','mkv','flv','gifv'].includes(extension) ? 'video' : 'image';
-    }
-
-    async function searchPosts(tags = null) {
-      const inputTags = document.getElementById('tagsInput').value;
-      const searchTags = tags || inputTags;
-      const url = `https://api.rule34.xxx/index.php?page=dapi&s=post&q=index&json=1&tags=${encodeURIComponent(searchTags)}&pid=${currentPage}`;
-      
-      try {
-        const response = await fetch(url);
-        if (!response.ok) throw new Error('Ошибка сети');
-        const posts = await response.json();
-        if (!posts || posts.length === 0) {
-          document.getElementById('postsContainer').innerHTML = 
-            '<p style="text-align: center; font-size: 1.2em; color: var(--c-text);">По вашему запросу ничего не найдено.</p>';
-        } else {
-          displayPosts(posts);
-        }
-        updatePaginator();
+    async function handleInitialLoad() {
+        const params = getURLParams();
         
-        const params = new URLSearchParams();
-        if (searchTags) {
-          params.set('tags', searchTags);
+        if (params.s === 'view' && params.postId) {
+            const post = currentPosts.find(p => p.id == params.postId);
+            if (post) openMediaView(post);
+            return;
         }
-        history.pushState({ tags: searchTags }, '', `?${params.toString()}`);
-      } catch (error) {
-        console.error('Ошибка при получении постов:', error);
-        document.getElementById('postsContainer').innerHTML = 
-          '<p style="text-align: center; font-size: 1.2em; color: var(--c-text);">Ошибка загрузки данных.</p>';
-      }
+
+        if (params.tags) {
+            document.getElementById('tagsInput').value = params.tags.replace(/\+/g, ' ');
+            currentPage = params.page || 0;
+            await searchPosts();
+        }
+    }
+
+    async function searchPosts(tag = null) {
+        const tags = tag || document.getElementById('tagsInput').value;
+        currentPage = Math.max(0, currentPage);
+        
+        updateURL({
+            tags: tags.replace(/ /g, '+'),
+            page: currentPage || undefined,
+            s: 'list'
+        });
+
+        const url = `https://api.rule34.xxx/index.php?page=dapi&s=post&q=index&json=1&tags=${encodeURIComponent(tags)}&pid=${currentPage}`;
+        
+        try {
+            const response = await fetch(url);
+            const posts = await response.json();
+            currentPosts = posts;
+            
+            if (posts.length === 0) {
+                document.getElementById('postsContainer').innerHTML = 
+                    '<p style="text-align: center; font-size: 1.2em; color: var(--c-text);">По вашему запросу ничего не найдено.</p>';
+            } else {
+                displayPosts(posts);
+            }
+            updatePaginator();
+        } catch (error) {
+            console.error('Ошибка при получении постов:', error);
+        }
     }
 
     function displayPosts(posts) {
-      const container = document.getElementById('postsContainer');
-      container.innerHTML = '';
-      posts.forEach(post => {
-        const thumb = document.createElement('div');
-        thumb.className = 'thumb';
-        
-        const mediaType = getMediaType(post);
-        thumb.dataset.mediaType = mediaType;
+        const container = document.getElementById('postsContainer');
+        container.innerHTML = '';
+        posts.forEach(post => {
+            const thumb = document.createElement('div');
+            thumb.className = 'thumb';
+            
+            const mediaType = getMediaType(post);
+            thumb.dataset.mediaType = mediaType;
 
-        const aspectRatio = post.width / post.height;
-        thumb.dataset.aspectRatio = aspectRatio < 0.75 ? 'tall' : 
-                                  aspectRatio > 1.5 ? 'wide' : 'normal';
+            const aspectRatio = post.width / post.height;
+            thumb.dataset.aspectRatio = aspectRatio < 0.75 ? 'tall' : 
+                                      aspectRatio > 1.5 ? 'wide' : 'normal';
 
-        const img = document.createElement('img');
-        img.src = post.preview_url;
-        img.alt = 'Preview';
-        img.loading = 'lazy';
-        img.style.aspectRatio = `${post.width}/${post.height}`;
-        img.onclick = () => openMediaView(post);
-        
-        thumb.appendChild(img);
-        container.appendChild(thumb);
-      });
+            const img = document.createElement('img');
+            img.src = post.preview_url;
+            img.alt = 'Preview';
+            img.loading = 'lazy';
+            img.style.aspectRatio = `${post.width}/${post.height}`;
+            img.onclick = () => openMediaView(post);
+            
+            thumb.appendChild(img);
+            container.appendChild(thumb);
+        });
+    }
+
+    function getMediaType(post) {
+        const url = post.file_url.toLowerCase();
+        const extension = url.split('.').pop().split(/[#?]/)[0];
+        return extension === 'gif' ? 'gif' : 
+               ['mp4','webm','mov','avi','wmv','mkv','flv','gifv'].includes(extension) ? 'video' : 'image';
     }
 
     async function openMediaView(post) {
-      document.body.style.overflow = 'hidden';
-      const mediaView = document.getElementById('mediaView');
-      const mediaContent = document.getElementById('mediaContent');
-      
-      const mediaType = getMediaType(post);
-      const aspectRatio = post.width / post.height;
+        updateURL({
+            s: 'view',
+            id: post.id,
+            tags: document.getElementById('tagsInput').value.replace(/ /g, '+')
+        });
 
-      const mediaElement = mediaType === 'gif' 
-        ? `<img src="${post.file_url}" alt="Full size" class="gif-media">`
-        : mediaType === 'video'
-        ? `<video controls><source src="${post.file_url}" type="video/mp4"></video>`
-        : `<img src="${post.file_url}" alt="Full size">`;
+        document.body.style.overflow = 'hidden';
+        const mediaView = document.getElementById('mediaView');
+        const mediaContent = document.getElementById('mediaContent');
+        
+        const mediaType = getMediaType(post);
+        const aspectRatio = post.width / post.height;
 
-      const comments = await fetchComments(post.id);
-      const tags = post.tags.split(' ');
+        const mediaElement = mediaType === 'gif' 
+            ? `<img src="${post.file_url}" alt="Full size" class="gif-media">`
+            : mediaType === 'video'
+            ? `<video controls><source src="${post.file_url}" type="video/mp4"></video>`
+            : `<img src="${post.file_url}" alt="Full size">`;
 
-      mediaContent.innerHTML = `
-        ${mediaElement}
-        <div class="media-info">
-          <div class="tag-list collapsed">
-            ${tags.map(tag => `<button class="tag" onclick="replaceSearchWithTag('${tag}')">${tag}</button>`).join('')}
-            ${tags.length > 10 ? 
-              `<button class="show-more-tags" onclick="expandTags(this)">
-                Показать ещё (${tags.length - 10})
-              </button>` : ''}
-          </div>
-          <div class="comments-section">
-            <h4>Комментарии:</h4>
-            ${comments.length ? 
-              comments.map(c => `
-                <div class="comment">
-                  <strong>${c.owner}:</strong> ${c.body}
+        const comments = await fetchComments(post.id);
+        const tags = post.tags.split(' ');
+
+        mediaContent.innerHTML = `
+            ${mediaElement}
+            <div class="media-info">
+                <div class="tag-list collapsed">
+                    ${tags.map(tag => `<button class="tag" onclick="replaceSearchWithTag('${tag}')">${tag}</button>`).join('')}
+                    ${tags.length > 10 ? 
+                        `<button class="show-more-tags" onclick="expandTags(this)">
+                            Показать ещё (${tags.length - 10})
+                        </button>` : ''}
                 </div>
-              `).join('') : '<p>Нет комментариев</p>'}
-          </div>
-        </div>
-      `;
+                <div class="comments-section">
+                    <h4>Комментарии:</h4>
+                    ${comments.length ? 
+                        comments.map(c => `
+                            <div class="comment">
+                                <strong>${c.owner}:</strong> ${c.body}
+                            </div>
+                        `).join('') : '<p>Нет комментариев</p>'}
+                </div>
+            </div>
+        `;
 
-      mediaView.classList.add('active');
-      history.pushState({ mediaViewOpen: true, postId: post.id }, '', `?id=${post.id}`);
-    }
-
-    async function openMediaViewById(postId) {
-      const url = `https://api.rule34.xxx/index.php?page=dapi&s=post&q=index&json=1&id=${postId}`;
-      try {
-        const response = await fetch(url);
-        if (!response.ok) throw new Error('Ошибка сети');
-        const posts = await response.json();
-        if (posts && posts[0]) {
-          openMediaView(posts[0]);
-        } else {
-          console.error('Пост не найден');
-          closeMediaView();
-        }
-      } catch (error) {
-        console.error('Ошибка при загрузке поста:', error);
-        closeMediaView();
-      }
+        mediaView.classList.add('active');
+        history.pushState({ mediaViewOpen: true }, '');
     }
 
     function closeMediaView() {
-      const mediaContent = document.getElementById('mediaContent');
-      const videos = mediaContent.getElementsByTagName('video');
-      Array.from(videos).forEach(video => {
-        video.pause();
-        video.currentTime = 0;
-      });
-      document.body.style.overflow = '';
-      document.getElementById('mediaView').classList.remove('active');
-      
-      const urlParams = new URLSearchParams(window.location.search);
-      const tags = urlParams.get('tags');
-      if (tags) {
-        history.pushState({ tags: tags }, '', `?tags=${tags}`);
-      } else {
-        history.pushState({}, '', window.location.pathname);
-      }
+        updateURL({
+            s: 'list',
+            id: undefined
+        });
+
+        const mediaContent = document.getElementById('mediaContent');
+        const videos = mediaContent.getElementsByTagName('video');
+        Array.from(videos).forEach(video => {
+            video.pause();
+            video.currentTime = 0;
+        });
+        document.body.style.overflow = '';
+        document.getElementById('mediaView').classList.remove('active');
     }
 
     async function fetchComments(postId) {
-      const url = `https://api.rule34.xxx/index.php?page=dapi&s=comment&q=index&post_id=${postId}`;
-      try {
-        const response = await fetch(url);
-        if (!response.ok) throw new Error('Ошибка сети при загрузке комментариев');
-        const text = await response.text();
-        const parser = new DOMParser();
-        const xmlDoc = parser.parseFromString(text, "application/xml");
-        const commentElements = xmlDoc.getElementsByTagName('comment');
-        return Array.from(commentElements).map(el => ({
-          owner: el.getAttribute('creator') || 'Анон',
-          body: el.getAttribute('body') || ''
-        }));
-      } catch (error) {
-        console.error('Ошибка при загрузке комментариев:', error);
-        return [];
-      }
+        const url = `https://api.rule34.xxx/index.php?page=dapi&s=comment&q=index&post_id=${postId}`;
+        try {
+            const response = await fetch(url);
+            if (!response.ok) throw new Error('Ошибка сети при загрузке комментариев');
+            const text = await response.text();
+            const parser = new DOMParser();
+            const xmlDoc = parser.parseFromString(text, "application/xml");
+            const commentElements = xmlDoc.getElementsByTagName('comment');
+            return Array.from(commentElements).map(el => ({
+                owner: el.getAttribute('creator') || 'Анон',
+                body: el.getAttribute('body') || ''
+            }));
+        } catch (error) {
+            console.error('Ошибка при загрузке комментариев:', error);
+            return [];
+        }
     }
 
     function changePage(direction) {
-      currentPage = Math.max(0, currentPage + direction);
-      searchPosts();
+        currentPage = Math.max(0, currentPage + direction);
+        updateURL({ page: currentPage || undefined });
+        searchPosts();
     }
 
     function updatePaginator() {
-      const pageElement = document.getElementById('currentPage');
-      pageElement.textContent = currentPage + 1;
+        const pageElement = document.getElementById('currentPage');
+        pageElement.textContent = currentPage + 1;
     }
 
     function handlePageInput(event) {
-      if (event.key === 'Enter') {
-        event.preventDefault();
-        updatePageFromInput();
-      }
+        if (event.key === 'Enter') {
+            event.preventDefault();
+            updatePageFromInput();
+        }
     }
 
     function updatePageFromInput() {
-      const pageElement = document.getElementById('currentPage');
-      const newPage = parseInt(pageElement.textContent) - 1;
-      
-      if (!isNaN(newPage) && newPage >= 0) {
-        currentPage = newPage;
-        searchPosts();
-      } else {
-        pageElement.textContent = currentPage + 1;
-      }
+        const pageElement = document.getElementById('currentPage');
+        const newPage = parseInt(pageElement.textContent) - 1;
+        
+        if (!isNaN(newPage) && newPage >= 0) {
+            currentPage = newPage;
+            searchPosts();
+        } else {
+            pageElement.textContent = currentPage + 1;
+        }
     }
 
     function expandTags(button) {
-      const tagList = button.parentElement;
-      tagList.classList.remove('collapsed');
-      button.remove();
+        const tagList = button.parentElement;
+        tagList.classList.remove('collapsed');
+        button.remove();
     }
 
     function toggleSidebar() {
-      const sidebar = document.getElementById('sidebar');
-      const isHidden = sidebar.style.display === 'none';
-      sidebar.style.display = isHidden ? 'block' : 'none';
-      localStorage.setItem('sidebarHidden', !isHidden);
+        const sidebar = document.getElementById('sidebar');
+        const isHidden = sidebar.style.display === 'none';
+        sidebar.style.display = isHidden ? 'block' : 'none';
+        localStorage.setItem('sidebarHidden', !isHidden);
     }
 
     function setupAwesomplete(input, tagsList) {
-      if (awesomeplete) {
-        awesomeplete.destroy();
-      }
-
-      const tagData = tagsList.map(tag => ({ label: tag, value: tag }));
-      
-      awesomeplete = new Awesomplete(input, {
-        list: tagData,
-        minChars: 2,
-        maxItems: 30,
-        autoFirst: true,
-        filter: function(text, input) {
-          const lastWord = input.match(/[^ ]*$/)[0].toLowerCase();
-          const tagLower = text.value.toLowerCase();
-          return tagLower.includes(lastWord) && tagLower !== lastWord;
-        },
-        item: function(item) {
-          const li = document.createElement('li');
-          li.innerHTML = `
-            <div class="tag-item">
-              <span class="tag-name">${item.value}</span>
-            </div>
-          `;
-          li.dataset.value = item.value;
-          return li;
-        },
-        replace: function(suggestion) {
-          const cursorPos = this.input.selectionStart;
-          const textBeforeCursor = this.input.value.slice(0, cursorPos);
-          const words = textBeforeCursor.split(/\s+/);
-          words.pop();
-          words.push(suggestion.value);
-          const newValue = words.join(' ') + ' ' + this.input.value.slice(cursorPos);
-          this.input.value = newValue;
-          this.input.focus();
-          this.input.selectionStart = this.input.selectionEnd = newValue.length;
-          this.evaluate();
+        if (awesomeplete) {
+            awesomeplete.destroy();
         }
-      });
-      
-      input.addEventListener('awesomplete-selectcomplete', () => {
+
+        const tagData = tagsList.map(tag => ({ label: tag, value: tag }));
+        
+        awesomeplete = new Awesomplete(input, {
+            list: tagData,
+            minChars: 2,
+            maxItems: 30,
+            autoFirst: true,
+            filter: function(text, input) {
+                const lastWord = input.match(/[^ ]*$/)[0].toLowerCase();
+                const tagLower = text.value.toLowerCase();
+                return tagLower.includes(lastWord) && tagLower !== lastWord;
+            },
+            item: function(item) {
+                const li = document.createElement('li');
+                li.innerHTML = `
+                    <div class="tag-item">
+                        <span class="tag-name">${item.value}</span>
+                    </div>
+                `;
+                li.dataset.value = item.value;
+                return li;
+            },
+            replace: function(suggestion) {
+                const cursorPos = this.input.selectionStart;
+                const textBeforeCursor = this.input.value.slice(0, cursorPos);
+                const words = textBeforeCursor.split(/\s+/);
+                words.pop();
+                words.push(suggestion.value);
+                const newValue = words.join(' ') + ' ' + this.input.value.slice(cursorPos);
+                this.input.value = newValue;
+                this.input.focus();
+                this.input.selectionStart = this.input.selectionEnd = newValue.length;
+                this.evaluate();
+            }
+        });
+        
+        input.addEventListener('awesomplete-selectcomplete', () => {
+            searchPosts();
+        });
+    }
+
+    function replaceSearchWithTag(tag) {
+        const input = document.getElementById('tagsInput');
+        input.value = tag;
+        currentPage = 0;
+        closeMediaView();
         searchPosts();
-      });
+    }
+
+    function addTagToSearch(tag) {
+        const input = document.getElementById('tagsInput');
+        const currentTags = input.value.split(' ').filter(t => t);
+        currentTags.push(tag);
+        input.value = currentTags.join(' ');
+        currentPage = 0;
+        closeMediaView();
+        searchPosts();
+    }
+
+    function detectMobile() {
+        return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || 
+               (navigator.maxTouchPoints && navigator.maxTouchPoints > 2);
     }
 
     document.addEventListener('DOMContentLoaded', async () => {
-      try {
-        isMobile = detectMobile();
-        
-        if (localStorage.getItem('sidebarHidden') === 'true') {
-          document.getElementById('sidebar').style.display = 'none';
-        }
-
-        let currentFile = 1;
-        const allTags = [];
-        const MAX_TAG_FILES = 20;
-
-        while(currentFile <= MAX_TAG_FILES) {
-          try {
-            const response = await fetch(`tags8/tags_${currentFile}.json`);
+        try {
+            isMobile = detectMobile();
             
-            if (!response.ok) {
-              if (response.status === 404) break;
-              throw new Error(`HTTP error! status: ${response.status}`);
+            if (localStorage.getItem('sidebarHidden') === 'true') {
+                document.getElementById('sidebar').style.display = 'none';
             }
 
-            const data = await response.json();
-            const validTags = data.filter(item => 
-              item?.name && item?.count && !isNaN(Number(item.count))
-            );
-            
-            allTags.push(...validTags);
-            currentFile++;
-          } catch(e) {
-            console.error(`Ошибка загрузки tags_${currentFile}.json:`, e);
-            break;
-          }
-        }
+            let currentFile = 1;
+            const allTags = [];
+            const MAX_TAG_FILES = 20;
 
-        if (allTags.length === 0) {
-          searchPosts();
-        } else {
-          const sortedTags = allTags
-            .map(tag => ({
-              name: tag.name.trim(),
-              count: Number(tag.count)
-            }))
-            .sort((a, b) => b.count - a.count);
+            while(currentFile <= MAX_TAG_FILES) {
+                try {
+                    const response = await fetch(`tags8/tags_${currentFile}.json`);
+                    
+                    if (!response.ok) {
+                        if (response.status === 404) break;
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
 
-          tagsList = sortedTags.map(t => t.name);
-          const input = document.getElementById('tagsInput');
-          setupAwesomplete(input, tagsList);
-
-          input.addEventListener('input', function() {
-            const words = this.value.split(' ');
-            const lastWord = words[words.length - 1];
-            
-            if (lastWord && lastWord.length >= 1) {
-              const filteredTags = tagsList
-                .filter(tag => tag.toLowerCase().startsWith(lastWord.toLowerCase()))
-                .map(tag => ({ label: tag, value: tag }));
-              
-              awesomeplete.list = filteredTags;
-              awesomeplete.evaluate();
-              
-              if (filteredTags.length > 0) {
-                awesomeplete.open();
-              }
+                    const data = await response.json();
+                    const validTags = data.filter(item => 
+                        item?.name && item?.count && !isNaN(Number(item.count))
+                    );
+                    
+                    allTags.push(...validTags);
+                    currentFile++;
+                } catch(e) {
+                    console.error(`Ошибка загрузки tags_${currentFile}.json:`, e);
+                    break;
+                }
             }
-          });
 
-          input.addEventListener('keydown', function(e) {
-            if (e.key === 'Enter' && awesomeplete.ul.childNodes.length > 0 && awesomeplete.opened) {
-              const selected = awesomeplete.ul.querySelector('.selected');
-              if (selected) {
-                e.preventDefault();
-                const event = new Event('mousedown');
-                selected.dispatchEvent(event);
-              } else if (awesomeplete.ul.childNodes.length > 0) {
-                e.preventDefault();
-                const event = new Event('mousedown');
-                awesomeplete.ul.childNodes[0].dispatchEvent(event);
-              }
+            if (allTags.length === 0) {
+                searchPosts();
+                return;
             }
-            
-            if (e.key === 'Tab' && awesomeplete.opened && awesomeplete.ul.childNodes.length > 0) {
-              e.preventDefault();
-              const event = new Event('mousedown');
-              awesomeplete.ul.childNodes[0].dispatchEvent(event);
-            }
-          });
+
+            const sortedTags = allTags
+                .map(tag => ({
+                    name: tag.name.trim(),
+                    count: Number(tag.count)
+                }))
+                .sort((a, b) => b.count - a.count);
+
+            tagsList = sortedTags.map(t => t.name);
+            const input = document.getElementById('tagsInput');
+            setupAwesomplete(input, tagsList);
+
+            input.addEventListener('input', function() {
+                const words = this.value.split(' ');
+                const lastWord = words[words.length - 1];
+                
+                if (lastWord && lastWord.length >= 1) {
+                    const filteredTags = tagsList
+                        .filter(tag => tag.toLowerCase().startsWith(lastWord.toLowerCase()))
+                        .map(tag => ({ label: tag, value: tag }));
+                    
+                    awesomeplete.list = filteredTags;
+                    awesomeplete.evaluate();
+                    
+                    if (filteredTags.length > 0) {
+                        awesomeplete.open();
+                    }
+                }
+            });
+
+            input.addEventListener('keydown', function(e) {
+                if (e.key === 'Enter' && awesomeplete.ul.childNodes.length > 0 && awesomeplete.opened) {
+                    const selected = awesomeplete.ul.querySelector('.selected');
+                    if (selected) {
+                        e.preventDefault();
+                        const event = new Event('mousedown');
+                        selected.dispatchEvent(event);
+                    } else if (awesomeplete.ul.childNodes.length > 0) {
+                        e.preventDefault();
+                        const event = new Event('mousedown');
+                        awesomeplete.ul.childNodes[0].dispatchEvent(event);
+                    }
+                }
+                
+                if (e.key === 'Tab' && awesomeplete.opened && awesomeplete.ul.childNodes.length > 0) {
+                    e.preventDefault();
+                    const event = new Event('mousedown');
+                    awesomeplete.ul.childNodes[0].dispatchEvent(event);
+                }
+            });
+
+            document.getElementById('site-title').addEventListener('click', function() {
+                document.getElementById('tagsInput').value = '';
+                currentPage = 0;
+                searchPosts();
+            });
+
+            await handleInitialLoad();
+
+        } catch (error) {
+            console.error('Глобальная ошибка:', error);
+            searchPosts();
         }
-
-        document.getElementById('site-title').addEventListener('click', function() {
-          document.getElementById('tagsInput').value = '';
-          currentPage = 0;
-          searchPosts();
-        });
-
-        const urlParams = new URLSearchParams(window.location.search);
-        const tags = urlParams.get('tags');
-        const postId = urlParams.get('id');
-
-        if (postId) {
-          await openMediaViewById(postId);
-        } else if (tags) {
-          document.getElementById('tagsInput').value = tags;
-          searchPosts(tags);
-        } else {
-          searchPosts();
-        }
-
-      } catch (error) {
-        console.error('Глобальная ошибка:', error);
-        searchPosts();
-      }
     });
 
     document.getElementById('mediaView').addEventListener('click', function(e) {
-      if (e.target === this) closeMediaView();
+        if (e.target === this) closeMediaView();
     });
 
     document.addEventListener('keydown', function(e) {
-      if (e.key === 'Escape' && document.getElementById('mediaView').classList.contains('active')) {
-        closeMediaView();
-      }
+        if (e.key === 'Escape' && document.getElementById('mediaView').classList.contains('active')) {
+            closeMediaView();
+        }
     });
 
-    window.addEventListener('popstate', function(event) {
-      const state = event.state;
-      const urlParams = new URLSearchParams(window.location.search);
-      const tags = urlParams.get('tags');
-      const postId = urlParams.get('id');
-
-      if (postId && state?.mediaViewOpen) {
-        openMediaViewById(postId);
-      } else if (tags && state?.tags) {
-        document.getElementById('tagsInput').value = tags;
-        searchPosts(tags);
-      } else {
-        document.getElementById('tagsInput').value = '';
-        closeMediaView();
-        searchPosts();
-      }
+    window.addEventListener('popstate', function() {
+        const params = getURLParams();
+        
+        if (params.s === 'view' && params.postId) {
+            const post = currentPosts.find(p => p.id == params.postId);
+            if (post) openMediaView(post);
+        } else {
+            document.getElementById('tagsInput').value = params.tags.replace(/\+/g, ' ');
+            currentPage = params.page || 0;
+            searchPosts();
+            closeMediaView();
+        }
     });
   </script>
 </body>
