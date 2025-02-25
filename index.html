@@ -56,6 +56,7 @@
       margin: 0;
       white-space: nowrap;
       flex-shrink: 0;
+      cursor: pointer;
     }
 
     .tag-search {
@@ -610,6 +611,7 @@
     const postsPerPage = 42;
     let awesomeplete;
     let isMobile = false;
+    let tagsList = [];
 
     // Определение мобильного устройства
     function detectMobile() {
@@ -632,7 +634,12 @@
         const response = await fetch(url);
         if (!response.ok) throw new Error('Ошибка сети');
         const posts = await response.json();
-        displayPosts(posts);
+        if (posts.length === 0) {
+          document.getElementById('postsContainer').innerHTML = 
+            '<p style="text-align: center; font-size: 1.2em; color: var(--c-text);">По вашему запросу ничего не найдено.</p>';
+        } else {
+          displayPosts(posts);
+        }
         updatePaginator();
       } catch (error) {
         console.error('Ошибка при получении постов:', error);
@@ -795,8 +802,6 @@
 
     // Упрощённая инициализация автозаполнения
     function setupAwesomplete(input, tagsList) {
-      console.log('Инициализация Awesomplete...');
-      
       if (awesomeplete) {
         awesomeplete.destroy();
       }
@@ -810,16 +815,13 @@
       });
       
       input.addEventListener('awesomplete-selectcomplete', () => {
-        console.log('Элемент выбран из списка');
         searchPosts();
       });
     }
 
     document.addEventListener('DOMContentLoaded', async () => {
       try {
-        console.log('Страница загружена');
         isMobile = detectMobile();
-        console.log('Мобильное устройство:', isMobile ? 'Да' : 'Нет');
         
         if (localStorage.getItem('sidebarHidden') === 'true') {
           document.getElementById('sidebar').style.display = 'none';
@@ -829,7 +831,6 @@
         const allTags = [];
         const MAX_TAG_FILES = 20;
 
-        console.log('Начинаем загрузку файлов тегов...');
         while(currentFile <= MAX_TAG_FILES) {
           try {
             const response = await fetch(`tags8/tags_${currentFile}.json`);
@@ -840,8 +841,6 @@
             }
 
             const data = await response.json();
-            console.log(`Загружен файл tags_${currentFile}.json`);
-
             const validTags = data.filter(item => 
               item?.name && item?.count && !isNaN(Number(item.count))
             );
@@ -854,10 +853,7 @@
           }
         }
 
-        console.log(`Загружено всего ${allTags.length} тегов`);
-        
         if (allTags.length === 0) {
-          console.error('Не удалось загрузить теги, автозаполнение будет отключено');
           searchPosts();
           return;
         }
@@ -869,10 +865,28 @@
           }))
           .sort((a, b) => b.count - a.count);
 
+        tagsList = sortedTags.map(t => t.name);
         const input = document.getElementById('tagsInput');
-        
-        const tagsList = sortedTags.map(t => t.name);
         setupAwesomplete(input, tagsList);
+
+        // Обработчик для обновления подсказок при вводе
+        input.addEventListener('input', function() {
+          const words = this.value.split(' ');
+          const lastWord = words[words.length - 1];
+          if (lastWord.length >= 2) {
+            awesomeplete.list = tagsList.filter(tag => 
+              tag.toLowerCase().startsWith(lastWord.toLowerCase())
+            );
+            awesomeplete.evaluate();
+          }
+        });
+
+        // Сброс тегов при нажатии на "Rule 34"
+        document.getElementById('site-title').addEventListener('click', function() {
+          document.getElementById('tagsInput').value = '';
+          currentPage = 0;
+          searchPosts();
+        });
 
         searchPosts();
 
