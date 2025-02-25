@@ -106,7 +106,8 @@
       position: relative;
     }
 
-    #tagsInput {
+    #tagsInput,
+    #mainSearchInput {
       width: 100%;
       padding: 12px 40px 12px 12px;
       background: var(--c-bg);
@@ -597,7 +598,7 @@
           <div class="search-container">
             <input 
               type="text" 
-              id="tagsInput" 
+              id="mainSearchInput" 
               placeholder="Введите теги для поиска..."
               autocomplete="off"
               autocapitalize="none"
@@ -689,14 +690,21 @@
 
     function startSearch(event) {
       event.preventDefault();
+      const mainInput = document.getElementById('mainSearchInput');
+      const mainInterfaceInput = document.getElementById('tagsInput');
+      mainInterfaceInput.value = mainInput.value;
       document.body.classList.add('show-interface');
       searchPosts();
     }
 
     function updateURL(params = {}) {
       const url = new URL(window.location);
+      if(!params.tags) {
+        const currentTags = document.getElementById('tagsInput').value;
+        params.tags = currentTags ? currentTags.replace(/ /g, '+') : undefined;
+      }
       Object.entries(params).forEach(([key, value]) => {
-        if (value !== undefined) {
+        if (value !== undefined && value !== '') {
           url.searchParams.set(key, value);
         } else {
           url.searchParams.delete(key);
@@ -717,7 +725,11 @@
 
     async function handleInitialLoad() {
       const params = getURLParams();
-      
+      const tagsInput = document.getElementById('tagsInput');
+      if (params.tags) {
+        tagsInput.value = params.tags.replace(/\+/g, ' ');
+      }
+
       if (params.s === 'view' && params.postId) {
         const post = await fetchPostById(params.postId);
         if (post) {
@@ -730,7 +742,6 @@
 
       if (params.tags || params.s === 'list') {
         document.body.classList.add('show-interface');
-        document.getElementById('tagsInput').value = params.tags?.replace(/\+/g, ' ') || '';
         currentPage = params.page || 0;
         await searchPosts();
       }
@@ -1049,6 +1060,14 @@
           tagsList = sortedTags.map(t => t.name);
           const input = document.getElementById('tagsInput');
           setupAwesomplete(input, tagsList);
+
+          const mainSearchInput = document.getElementById('mainSearchInput');
+          new Awesomplete(mainSearchInput, {
+            list: tagsList,
+            minChars: 2,
+            maxItems: 15,
+            autoFirst: true
+          });
         }
 
         await handleInitialLoad();
