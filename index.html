@@ -800,42 +800,65 @@
       localStorage.setItem('sidebarHidden', !isHidden);
     }
 
-    // Упрощённая инициализация автозаполнения
+    // Расширенная инициализация автозаполнения
     function setupAwesomplete(input, tagsList) {
       if (awesomeplete) {
         awesomeplete.destroy();
       }
       
+      // Преобразуем список простых строк в объекты для лучшей работы с ними
+      const tagData = tagsList.map(tag => ({ label: tag, value: tag }));
+      
       awesomeplete = new Awesomplete(input, {
-        list: tagsList,
+        list: tagData,
         minChars: 2,
         maxItems: 30,
         autoFirst: true,
-        filter: Awesomplete.FILTER_STARTSWITH
+        filter: function(text, input) {
+          // Извлекаем только последнее слово из строки ввода
+          const lastWord = input.match(/[^ ]*$/)[0];
+          return Awesomplete.FILTER_CONTAINS(text.value, lastWord);
+        },
+        item: function(item) {
+          const li = document.createElement('li');
+          li.innerHTML = `
+            <div class="tag-item">
+              <span class="tag-name">${item.value}</span>
+            </div>
+          `;
+          li.dataset.value = item.value;
+          return li;
+        },
+        replace: function(suggestion) {
+          // Сохраняем текущую позицию курсора
+          const cursorPos = this.input.selectionStart;
+          
+          // Получаем текст до курсора
+          const textBeforeCursor = this.input.value.slice(0, cursorPos);
+          
+          // Разбиваем на слова
+          const words = textBeforeCursor.split(/\s+/);
+          
+          // Заменяем последнее слово предложенным тегом
+          words.pop();
+          words.push(suggestion.value);
+          
+          // Собираем новое значение с сохранением текста после курсора
+          const newValue = words.join(' ') + ' ' + this.input.value.slice(cursorPos);
+          this.input.value = newValue;
+          
+          // Возвращаем фокус в поле и устанавливаем курсор в конец
+          this.input.focus();
+          this.input.selectionStart = this.input.selectionEnd = newValue.length;
+          
+          // Перезапускаем оценку для новых предложений
+          this.evaluate();
+        }
       });
       
-      input.addEventListener('awesomplete-selectcomplete', function(e) {
-        // Разбиваем текущее значение на слова
-        const words = this.value.split(' ');
-        
-        // Заменяем последнее слово на выбранный тег
-        if (words.length > 1) {
-          words[words.length - 1] = e.text.value;
-          this.value = words.join(' ') + ' ';
-        } else {
-          this.value = e.text.value + ' ';
-        }
-        
-        // Предотвращаем стандартное поведение Awesomplete
-        e.preventDefault();
-        
-        // Устанавливаем фокус обратно на поле ввода и перемещаем курсор в конец
-        this.focus();
-        const length = this.value.length;
-        this.setSelectionRange(length, length);
-        
-        // Не вызываем searchPosts сразу, даем пользователю возможность добавить больше тегов
-        // searchPosts();
+      input.addEventListener('awesomplete-selectcomplete', () => {
+        // Поиск постов происходит при выборе тега из списка
+        searchPosts();
       });
     }
 
@@ -894,18 +917,47 @@
           const words = this.value.split(' ');
           const lastWord = words[words.length - 1];
           
-          // Обновляем список подсказок только для последнего слова
-          if (lastWord.length >= 2) {
-            // Создаем новый временный список только с тегами, начинающимися с lastWord
-            const filteredTags = tagsList.filter(tag => 
-              tag.toLowerCase().startsWith(lastWord.toLowerCase())
-            );
+          if (lastWord && lastWord.length >= 1) {
+            // Фильтруем только те теги, которые начинаются с последнего слова
+            const filteredTags = tagsList
+              .filter(tag => tag.toLowerCase().startsWith(lastWord.toLowerCase()))
+              .map(tag => ({ label: tag, value: tag }));
             
-            // Обновляем список подсказок
+            // Обновляем список предложений
             awesomeplete.list = filteredTags;
-            
-            // Принудительно переоцениваем и показываем подсказки
             awesomeplete.evaluate();
+            
+            // Если есть предложения, показываем выпадающий список
+            if (filteredTags.length > 0) {
+              awesomeplete.open();
+            }
+          }
+        });
+
+        // Добавляем обработчик нажатия клавиш для лучшей навигации
+        input.addEventListener('keydown', function(e) {
+          // Если нажат Enter и список предложений открыт
+          if (e.key === 'Enter' && awesomeplete.ul.childNodes.length > 0 && awesomeplete.opened) {
+            // Если есть выбранный элемент, используем его
+            const selected = awesomeplete.ul.querySelector('.selected');
+            if (selected) {
+              e.preventDefault();
+              // Триггерим выбор элемента
+              const event = new Event('mousedown');
+              selected.dispatchEvent(event);
+            } else if (awesomeplete.ul.childNodes.length > 0) {
+              // Если нет выбранного элемента, но есть предложения, выбираем первое
+              e.preventDefault();
+              const event = new Event('mousedown');
+              awesomeplete.ul.childNodes[0].dispatchEvent(event);
+            }
+          }
+          
+          // Если нажата Tab, выбираем первое предложение
+          if (e.key === 'Tab' && awesomeplete.opened && awesomeplete.ul.childNodes.length > 0) {
+            e.preventDefault();
+            const event = new Event('mousedown');
+            awesomeplete.ul.childNodes[0].dispatchEvent(event);
           }
         });
 
