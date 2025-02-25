@@ -382,6 +382,85 @@ body {
   background: var(--c-hover);
 }
 
+.awesomplete {
+  width: 100%;
+  position: relative;
+}
+
+.awesomplete > ul {
+  background: var(--c-bg-alt);
+  border: 1px solid var(--c-border);
+  border-top: none;
+  border-radius: 0 0 6px 6px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  margin: 0;
+  padding: 8px 0;
+  max-height: 300px;
+  overflow-y: auto;
+  position: absolute;
+  width: calc(100% + 2px);
+  left: -1px;
+  top: 100%;
+  z-index: 3;
+  animation: scaleIn 0.15s ease;
+}
+
+.awesomplete > ul > li {
+  color: var(--c-text);
+  padding: 8px 16px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  list-style: none;
+  line-height: 1.4;
+  box-sizing: border-box;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.awesomplete > ul > li:hover,
+.awesomplete > ul > li[aria-selected="true"] {
+  background: var(--c-link);
+  color: var(--c-bg);
+}
+
+.awesomplete mark {
+  background: rgba(74, 222, 128, 0.3);
+  color: inherit;
+}
+
+@keyframes scaleIn {
+  from {
+    opacity: 0;
+    transform: translateY(-3px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.awesomplete .visually-hidden,
+.awesomplete [aria-selected="false"]:empty {
+  display: none !important;
+}
+
+/* Специфические стили для поддержки мобильного автозаполнения */
+.awesomplete.mobile-active > ul {
+  display: block !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+}
+
+/* Улучшаем видимость отметок совпадения в выпадающем списке */
+.awesomplete mark {
+  background: rgba(74, 222, 128, 0.3);
+  padding: 0 2px;
+  border-radius: 2px;
+  font-weight: bold;
+  color: inherit;
+}
+
 @media (max-width: 768px) {
   .container {
     flex-direction: column;
@@ -445,67 +524,28 @@ body {
   .pagination {
     gap: 5px;
   }
-}
-
-.awesomplete {
-  width: 100%;
-  position: relative;
-}
-
-.awesomplete > ul {
-  background: var(--c-bg-alt);
-  border: 1px solid var(--c-border);
-  border-top: none;
-  border-radius: 0 0 6px 6px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-  margin: 0;
-  padding: 8px 0;
-  max-height: 300px;
-  overflow-y: auto;
-  position: absolute;
-  width: calc(100% + 2px);
-  left: -1px;
-  top: 100%;
-  z-index: 3;
-  animation: scaleIn 0.15s ease;
-}
-
-.awesomplete > ul > li {
-  color: var(--c-text);
-  padding: 8px 16px;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  list-style: none;
-  line-height: 1.4;
-  box-sizing: border-box;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.awesomplete > ul > li:hover,
-.awesomplete > ul > li[aria-selected="true"] {
-  background: var(--c-link);
-  color: var(--c-bg);
-}
-
-.awesomplete mark {
-  background: rgba(74, 222, 128, 0.3);
-  color: inherit;
-}
-
-@keyframes scaleIn {
-  from {
-    opacity: 0;
-    transform: translateY(-3px);
+  
+  /* Улучшенные стили для Awesomplete на мобильных устройствах */
+  .awesomplete > ul {
+    position: fixed;
+    top: auto;
+    left: 0;
+    right: 0;
+    width: 100%;
+    max-height: 40vh;
+    border-radius: 0;
+    z-index: 1001;
+    box-shadow: 0 -4px 10px rgba(0, 0, 0, 0.2);
+    bottom: 0;
   }
-  to {
-    opacity: 1;
-    transform: translateY(0);
+  
+  .awesomplete > ul > li {
+    padding: 12px 16px;  /* Увеличенная высота элементов для тач-устройств */
+    font-size: 16px;     /* Оптимальный размер шрифта для мобильных */
   }
-}
-
-.awesomplete .visually-hidden,
-.awesomplete [aria-selected="false"]:empty {
-  display: none !important;
+  
+  #tagsInput:focus {
+    border-color: var(--c-link);
+    box-shadow: 0 0 0 2px rgba(74, 222, 128, 0.2);
+  }
 }
