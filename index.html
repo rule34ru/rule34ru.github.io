@@ -814,8 +814,28 @@
         filter: Awesomplete.FILTER_STARTSWITH
       });
       
-      input.addEventListener('awesomplete-selectcomplete', () => {
-        searchPosts();
+      input.addEventListener('awesomplete-selectcomplete', function(e) {
+        // Разбиваем текущее значение на слова
+        const words = this.value.split(' ');
+        
+        // Заменяем последнее слово на выбранный тег
+        if (words.length > 1) {
+          words[words.length - 1] = e.text.value;
+          this.value = words.join(' ') + ' ';
+        } else {
+          this.value = e.text.value + ' ';
+        }
+        
+        // Предотвращаем стандартное поведение Awesomplete
+        e.preventDefault();
+        
+        // Устанавливаем фокус обратно на поле ввода и перемещаем курсор в конец
+        this.focus();
+        const length = this.value.length;
+        this.setSelectionRange(length, length);
+        
+        // Не вызываем searchPosts сразу, даем пользователю возможность добавить больше тегов
+        // searchPosts();
       });
     }
 
@@ -873,10 +893,18 @@
         input.addEventListener('input', function() {
           const words = this.value.split(' ');
           const lastWord = words[words.length - 1];
+          
+          // Обновляем список подсказок только для последнего слова
           if (lastWord.length >= 2) {
-            awesomeplete.list = tagsList.filter(tag => 
+            // Создаем новый временный список только с тегами, начинающимися с lastWord
+            const filteredTags = tagsList.filter(tag => 
               tag.toLowerCase().startsWith(lastWord.toLowerCase())
             );
+            
+            // Обновляем список подсказок
+            awesomeplete.list = filteredTags;
+            
+            // Принудительно переоцениваем и показываем подсказки
             awesomeplete.evaluate();
           }
         });
