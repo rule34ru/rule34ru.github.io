@@ -1,6 +1,13 @@
 let currentPage = 0;
 const postsPerPage = 42;
 let awesomeplete;
+let isMobile = false;
+
+// Определение мобильного устройства
+function detectMobile() {
+  return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || 
+         (navigator.maxTouchPoints && navigator.maxTouchPoints > 2);
+}
 
 function getMediaType(post) {
   const url = post.file_url.toLowerCase();
@@ -178,8 +185,118 @@ function toggleSidebar() {
   localStorage.setItem('sidebarHidden', !isHidden);
 }
 
+// Улучшенная инициализация автозаполнения
+function setupAwesomplete(input, tagsList) {
+  console.log('Инициализация Awesomplete...');
+  
+  // Удаляем предыдущий экземпляр, если существует
+  if (awesomeplete) {
+    awesomeplete.destroy();
+  }
+  
+  // Создаем новый экземпляр с улучшенными настройками
+  awesomeplete = new Awesomplete(input, {
+    list: tagsList,
+    minChars: 2,
+    maxItems: 30,
+    autoFirst: true,
+    filter: function(text, inputVal) {
+      const words = inputVal.split(' ');
+      const lastWord = words[words.length - 1].toLowerCase();
+      return lastWord.length >= 2 && text.toLowerCase().includes(lastWord);
+    },
+    item: function(text, inputVal) {
+      const li = document.createElement('li');
+      const words = inputVal.split(' ');
+      const lastWord = words[words.length - 1].toLowerCase();
+      const regex = new RegExp(lastWord, 'gi');
+      li.innerHTML = text.replace(regex, '<mark>$&</mark>');
+      return li;
+    },
+    replace: function(text) {
+      const currentValue = this.input.value;
+      const words = currentValue.split(' ');
+      words.pop();
+      words.push(text);
+      this.input.value = words.join(' ').replace(/\s+/g, ' ').trim() + ' ';
+      
+      // Специальная обработка для мобильных устройств
+      if (isMobile) {
+        setTimeout(() => {
+          this.input.focus();
+          // Имитируем клик для показа клавиатуры
+          this.input.click();
+        }, 100);
+      } else {
+        this.input.focus();
+      }
+    }
+  });
+  
+  // Добавляем специальные обработчики для мобильных устройств
+  if (isMobile) {
+    console.log('Добавление мобильных обработчиков событий');
+    
+    // Принудительное обновление списка при вводе
+    input.addEventListener('input', function() {
+      const lastWord = this.value.trim().split(' ').pop();
+      if (lastWord.length >= 2) {
+        setTimeout(() => {
+          awesomeplete.evaluate();
+          // Если есть результаты, показываем список
+          if (awesomeplete.ul.childNodes.length > 0) {
+            awesomeplete.open();
+            
+            // Важно: применяем CSS-класс для принудительного отображения
+            awesomeplete.container.classList.add('mobile-active');
+          }
+        }, 50);
+      }
+    });
+    
+    // Обработка сенсорных событий
+    input.addEventListener('touchstart', function() {
+      const lastWord = this.value.trim().split(' ').pop();
+      if (lastWord.length >= 2) {
+        setTimeout(() => {
+          awesomeplete.evaluate();
+          awesomeplete.open();
+        }, 50);
+      }
+    });
+    
+    // Дополнительно обрабатываем фокус
+    input.addEventListener('focus', function() {
+      console.log('Поле ввода получило фокус');
+      const lastWord = this.value.trim().split(' ').pop();
+      if (lastWord.length >= 2) {
+        setTimeout(() => {
+          awesomeplete.evaluate();
+          awesomeplete.open();
+          awesomeplete.container.classList.add('mobile-active');
+        }, 50);
+      }
+    });
+  }
+  
+  // Обработчик выбора элемента из списка
+  input.addEventListener('awesomplete-selectcomplete', () => {
+    console.log('Элемент выбран из списка');
+    if (isMobile) {
+      // Для мобильных устройств задержка перед поиском
+      setTimeout(() => searchPosts(), 100);
+    } else {
+      searchPosts();
+    }
+  });
+}
+
 document.addEventListener('DOMContentLoaded', async () => {
   try {
+    console.log('Страница загружена');
+    isMobile = detectMobile();
+    console.log('Мобильное устройство:', isMobile ? 'Да' : 'Нет');
+    
     if (localStorage.getItem('sidebarHidden') === 'true') {
       document.getElementById('sidebar').style.display = 'none';
     }
@@ -188,6 +305,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     const allTags = [];
     const MAX_TAG_FILES = 20;
 
+    console.log('Начинаем загрузку файлов тегов...');
     while(currentFile <= MAX_TAG_FILES) {
       try {
         const response = await fetch(`tags8/tags_${currentFile}.json`);
@@ -212,6 +330,14 @@ document.addEventListener('DOMContentLoaded', async () => {
       }
     }
 
+    console.log(`Загружено всего ${allTags.length} тегов`);
+    
+    if (allTags.length === 0) {
+      console.error('Не удалось загрузить теги, автозаполнение будет отключено');
+      searchPosts();
+      return;
+    }
+
     const sortedTags = allTags
       .map(tag => ({
         name: tag.name.trim(),
@@ -220,43 +346,17 @@ document.addEventListener('DOMContentLoaded', async () => {
       .sort((a, b) => b.count - a.count);
 
     const input = document.getElementById('tagsInput');
-    awesomeplete = new Awesomplete(input, {
-	  list: sortedTags.map(t => t.name),
-	  minChars: 2,
-	  maxItems: 30,
-	  autoFirst: true,
-	  mobile: true,
-	  replace: function(text) {
-		const currentValue = this.input.value;
-		const words = currentValue.split(' ');
-		words.pop();
-		words.push(text);
-		this.input.value = words.join(' ').replace(/\s+/g, ' ').trim() + ' ';
-		this.input.focus();
-	  },
-	  filter: function(text, inputVal) {
-		const words = inputVal.split(' ');
-		const lastWord = words[words.length - 1].toLowerCase();
-		return lastWord.length >= 2 && text.toLowerCase().includes(lastWord);
-	  },
-	  item: function(text, inputVal) {
-		const li = document.createElement('li');
-		const words = inputVal.split(' ');
-		const lastWord = words[words.length - 1].toLowerCase();
-		const regex = new RegExp(lastWord, 'gi');
-		li.innerHTML = text.replace(regex, '<mark>$&</mark>');
-		return li;
-	  }
-	});
-
-	input.addEventListener('awesomplete-selectcomplete', () => {
-	  searchPosts();
-	});
+    
+    // Инициализация автозаполнения
+    const tagsList = sortedTags.map(t => t.name);
+    setupAwesomplete(input, tagsList);
 
     searchPosts();
 
   } catch (error) {
     console.error('Глобальная ошибка:', error);
+    // В случае ошибки, все равно пытаемся загрузить посты
+    searchPosts();
   }
 });
 
