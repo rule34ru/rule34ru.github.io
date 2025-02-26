@@ -632,7 +632,7 @@
                 spellcheck="false"
                 aria-label="Поиск по тегам"
               >
-              <button type="submit" class="search-button">
+              <button type="submit" class="search-button" id="searchButton">
                 <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                   <path d="M10 2a8 8 0 0 1 6.32 12.906l5.387 5.387a1 1 0 0 1-1.414 1.414l-5.387-5.387A8 8 0 1 1 10 2zm0 2a6 6 0 1 0 0 12 6 6 0 0 0 0-12z"/>
                 </svg>
@@ -683,7 +683,8 @@
   <script>
     let currentPage = 0;
     const postsPerPage = 42;
-    let awesomeplete;
+    let awesompleteTags;
+    let awesompleteMain;
     let isMobile = false;
     let tagsList = [];
     let currentPosts = [];
@@ -728,6 +729,11 @@
       const tagsInput = document.getElementById('tagsInput');
       if (params.tags) {
         tagsInput.value = params.tags.replace(/\+/g, ' ');
+        
+        // Автоматически нажимаем кнопку поиска если открываем пост по ссылке
+        if (params.s === 'view' && params.postId) {
+          document.getElementById('searchButton').click();
+        }
       }
 
       if (params.s === 'view' && params.postId) {
@@ -946,32 +952,52 @@
       localStorage.setItem('sidebarHidden', !isHidden);
     }
 
-    function setupAwesomplete(input, tagsList) {
-      if (awesomeplete) {
-        awesomeplete.destroy();
-      }
+    function setupAwesomplete(input, tagsList, minChars = 1) {
+      // Сортировка тегов по популярности
+      const sortedTags = tagsList.sort((a, b) => {
+        const aCount = a.count || 0;
+        const bCount = b.count || 0;
+        return bCount - aCount;
+      }).map(tag => tag.name || tag);
 
-      const tagData = tagsList.map(tag => ({ label: tag, value: tag }));
-      
-      awesomeplete = new Awesomplete(input, {
-        list: tagData,
-        minChars: 2,
+      return new Awesomplete(input, {
+        list: sortedTags,
+        minChars: minChars,
         maxItems: 30,
         autoFirst: true,
         filter: function(text, input) {
           const lastWord = input.match(/[^ ]*$/)[0].toLowerCase();
-          const tagLower = text.value.toLowerCase();
-          return tagLower.includes(lastWord) && tagLower !== lastWord;
+          if (!lastWord) return false;
+          
+          const tagLower = text.toLowerCase();
+          
+          // Сначала проверяем, начинается ли тег с введенного текста
+          const startsWithMatch = tagLower.startsWith(lastWord);
+          
+          // Если нет прямого совпадения с началом, тогда проверяем, содержится ли текст где-то в теге
+          const containsMatch = !startsWithMatch && tagLower.includes(lastWord);
+          
+          return (startsWithMatch || containsMatch) && tagLower !== lastWord;
         },
-        item: function(item) {
-          const li = document.createElement('li');
-          li.innerHTML = `
-            <div class="tag-item">
-              <span class="tag-name">${item.value}</span>
-            </div>
-          `;
-          li.dataset.value = item.value;
-          return li;
+        sort: function(a, b) {
+          const input = this.input.value.toLowerCase();
+          const lastWord = input.match(/[^ ]*$/)[0].toLowerCase();
+          
+          const aLower = a.value.toLowerCase();
+          const bLower = b.value.toLowerCase();
+          
+          // Если один из тегов начинается с введенного текста, а другой нет
+          const aStartsWith = aLower.startsWith(lastWord);
+          const bStartsWith = bLower.startsWith(lastWord);
+          
+          if (aStartsWith && !bStartsWith) return -1;
+          if (!aStartsWith && bStartsWith) return 1;
+          
+          // Если оба начинаются или оба не начинаются, сортируем по популярности
+          const aPopularity = tagsList.find(t => (t.name || t).toLowerCase() === aLower)?.count || 0;
+          const bPopularity = tagsList.find(t => (t.name || t).toLowerCase() === bLower)?.count || 0;
+          
+          return bPopularity - aPopularity;
         },
         replace: function(suggestion) {
           const cursorPos = this.input.selectionStart;
@@ -982,13 +1008,8 @@
           const newValue = words.join(' ') + ' ' + this.input.value.slice(cursorPos);
           this.input.value = newValue;
           this.input.focus();
-          this.input.selectionStart = this.input.selectionEnd = newValue.length;
-          this.evaluate();
+          this.input.selectionStart = this.input.selectionEnd = words.join(' ').length + 1;
         }
-      });
-      
-      input.addEventListener('awesomplete-selectcomplete', () => {
-        searchPosts();
       });
     }
 
@@ -1057,16 +1078,21 @@
             }))
             .sort((a, b) => b.count - a.count);
 
-          tagsList = sortedTags.map(t => t.name);
-          const input = document.getElementById('tagsInput');
-          setupAwesomplete(input, tagsList);
-
+          tagsList = sortedTags;
+          
+          const tagsInput = document.getElementById('tagsInput');
+          awesompleteTags = setupAwesomplete(tagsInput, tagsList, 1);
+          
           const mainSearchInput = document.getElementById('mainSearchInput');
-          new Awesomplete(mainSearchInput, {
-            list: tagsList,
-            minChars: 2,
-            maxItems: 30,
-            autoFirst: true
+          awesompleteMain = setupAwesomplete(mainSearchInput, tagsList, 1);
+          
+          // Устанавливаем обработчик события выбора тега
+          tagsInput.addEventListener('awesomplete-selectcomplete', () => {
+            // Не вызываем автоматический поиск для более контролируемого поведения
+          });
+          
+          mainSearchInput.addEventListener('awesomplete-selectcomplete', () => {
+            // Не вызываем автоматический поиск для более контролируемого поведения  
           });
         }
 
