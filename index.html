@@ -356,16 +356,27 @@
       background: var(--c-bg);
       border-radius: 8px;
       margin-top: 15px;
+      width: 100%;
+      max-width: 1600px;
     }
 
     .comment {
-      padding: 10px;
+      padding: 12px 15px;
       border-bottom: 1px solid var(--c-border);
       word-wrap: break-word;
-      overflow-wrap: anywhere;
+      overflow-wrap: break-word;
       hyphens: auto;
-      white-space: pre-wrap;
-      max-width: 100%;
+      white-space: normal;
+      text-align: left;
+      line-height: 1.5;
+      margin: 8px 0;
+    }
+
+    .comment strong {
+      display: block;
+      margin-bottom: 4px;
+      color: var(--c-link);
+      font-size: 0.95em;
     }
 
     #paginator {
@@ -585,6 +596,15 @@
 
       .hero-content {
         padding: 20px;
+      }
+
+      .comment {
+        padding: 10px;
+        font-size: 0.9em;
+      }
+      
+      .comment strong {
+        font-size: 0.9em;
       }
     }
   </style>
@@ -858,7 +878,8 @@
             ${comments.length ? 
               comments.map(c => `
                 <div class="comment">
-                  <strong>${c.owner}:</strong> ${c.body}
+                  <strong>${c.owner}:</strong> 
+                  <span class="comment-text">${c.body.replace(/</g, '&lt;').replace(/>/g, '&gt;')}</span>
                 </div>
               `).join('') : '<p>Нет комментариев</p>'}
           </div>
