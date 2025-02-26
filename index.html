@@ -728,22 +728,14 @@
       const tagsInput = document.getElementById('tagsInput');
       if (params.tags) {
         tagsInput.value = params.tags.replace(/\+/g, ' ');
+        await searchPosts();
       }
 
       if (params.s === 'view' && params.postId) {
         const post = await fetchPostById(params.postId);
         if (post) {
-          currentPosts = [post];
-          document.body.classList.add('show-interface');
           openMediaView(post);
         }
-        return;
-      }
-
-      if (params.tags || params.s === 'list') {
-        document.body.classList.add('show-interface');
-        currentPage = params.page || 0;
-        await searchPosts();
       }
     }
 
@@ -946,30 +938,21 @@
       localStorage.setItem('sidebarHidden', !isHidden);
     }
 
-    function setupAwesomplete(input, tagsList) {
-      if (awesomeplete) {
-        awesomeplete.destroy();
-      }
-
-      const tagData = tagsList.map(tag => ({ label: tag, value: tag }));
-      
-      awesomeplete = new Awesomplete(input, {
-        list: tagData,
+    function setupAwesomplete(input) {
+      new Awesomplete(input, {
+        list: tagsList,
         minChars: 2,
         maxItems: 30,
         autoFirst: true,
-        filter: function(text, input) {
-          const lastWord = input.match(/[^ ]*$/)[0].toLowerCase();
-          const tagLower = text.value.toLowerCase();
-          return tagLower.includes(lastWord) && tagLower !== lastWord;
+        sort: false,
+        filter: function(text, inputVal) {
+          const lastWord = inputVal.match(/[^\s]*$/)[0].toLowerCase();
+          const tag = text.value.toLowerCase();
+          return tag.startsWith(lastWord) || tag.includes(lastWord);
         },
         item: function(item) {
           const li = document.createElement('li');
-          li.innerHTML = `
-            <div class="tag-item">
-              <span class="tag-name">${item.value}</span>
-            </div>
-          `;
+          li.innerHTML = item.value;
           li.dataset.value = item.value;
           return li;
         },
@@ -985,10 +968,6 @@
           this.input.selectionStart = this.input.selectionEnd = newValue.length;
           this.evaluate();
         }
-      });
-      
-      input.addEventListener('awesomplete-selectcomplete', () => {
-        searchPosts();
       });
     }
 
@@ -1010,70 +989,26 @@
       searchPosts();
     }
 
-    function detectMobile() {
-      return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || 
-             (navigator.maxTouchPoints && navigator.maxTouchPoints > 2);
-    }
-
     document.addEventListener('DOMContentLoaded', async () => {
       try {
-        isMobile = detectMobile();
+        const response = await fetch('https://api.rule34.xxx/index.php?page=tags&s=list&json=1');
+        const data = await response.json();
         
+        tagsList = data
+          .filter(item => item?.name && item?.count)
+          .sort((a, b) => b.count - a.count)
+          .map(item => item.name);
+
+        setupAwesomplete(document.getElementById('tagsInput'));
+        setupAwesomplete(document.getElementById('mainSearchInput'));
+
         if (localStorage.getItem('sidebarHidden') === 'true') {
           document.getElementById('sidebar').style.display = 'none';
         }
 
-        let currentFile = 1;
-        const allTags = [];
-        const MAX_TAG_FILES = 20;
-
-        while(currentFile <= MAX_TAG_FILES) {
-          try {
-            const response = await fetch(`tags8/tags_${currentFile}.json`);
-            
-            if (!response.ok) {
-              if (response.status === 404) break;
-              throw new Error(`HTTP error! status: ${response.status}`);
-            }
-
-            const data = await response.json();
-            const validTags = data.filter(item => 
-              item?.name && item?.count && !isNaN(Number(item.count))
-            );
-            
-            allTags.push(...validTags);
-            currentFile++;
-          } catch(e) {
-            console.error(`Ошибка загрузки tags_${currentFile}.json:`, e);
-            break;
-          }
-        }
-
-        if (allTags.length > 0) {
-          const sortedTags = allTags
-            .map(tag => ({
-              name: tag.name.trim(),
-              count: Number(tag.count)
-            }))
-            .sort((a, b) => b.count - a.count);
-
-          tagsList = sortedTags.map(t => t.name);
-          const input = document.getElementById('tagsInput');
-          setupAwesomplete(input, tagsList);
-
-          const mainSearchInput = document.getElementById('mainSearchInput');
-          new Awesomplete(mainSearchInput, {
-            list: tagsList,
-            minChars: 2,
-            maxItems: 30,
-            autoFirst: true
-          });
-        }
-
         await handleInitialLoad();
-
       } catch (error) {
-        console.error('Глобальная ошибка:', error);
+        console.error('Ошибка инициализации:', error);
       }
     });
 
@@ -1111,5 +1046,7 @@
       }
     });
   </script>
+</body>
+</html>
 </body>
 </html>
