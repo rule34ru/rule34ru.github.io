@@ -952,7 +952,7 @@
       localStorage.setItem('sidebarHidden', !isHidden);
     }
 
-    function setupAwesomplete(input, tagsList, minChars = 1) {
+    function setupAwesomplete(input, tagsList, minChars = 2) {
       // Сортировка тегов по популярности
       const sortedTags = tagsList.sort((a, b) => {
         const aCount = a.count || 0;
