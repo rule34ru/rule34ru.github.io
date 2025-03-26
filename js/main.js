@@ -833,30 +833,41 @@ function addTagToSearch(tagToAdd) {
  * @param {object} params - Key-value pairs of parameters to set (e.g., {tags: '...', page: 1}).
  * @param {boolean} [usePushState=false] - If true, use pushState to create a new history entry.
  */
-function updateURL(params = {}, usePushState = false) {
+function updateURL(params = {}, forcePush = false) {
   try {
     const url = new URL(window.location); // Get current URL object
 
     // Define the keys we manage in the URL
     const managedKeys = ['tags', 'page', 'id', 's'];
 
+    // --- Build the target URL ---
+    const targetUrl = new URL(window.location); // Start with current
     // Clear existing managed parameters first
-    managedKeys.forEach(key => url.searchParams.delete(key));
-
-    // Set new parameters if they have a meaningful value
+    managedKeys.forEach(key => targetUrl.searchParams.delete(key));
+    // Add new parameters if they have a meaningful value
     Object.entries(params).forEach(([key, value]) => {
         if (managedKeys.includes(key) && value !== undefined && value !== null && value !== '') {
-             // Special handling for page=0 (don't add it to URL unless explicitly needed elsewhere)
-             // This implementation includes page=0 if provided. Modify if needed.
-            url.searchParams.set(key, value);
+            // Special handling for tags: ensure '+' encoding if needed (though encodeURIComponent usually handles it)
+            // const encodedValue = (key === 'tags') ? value.replace(/ /g, '+') : value;
+            targetUrl.searchParams.set(key, value);
         }
     });
+    const newUrlString = targetUrl.toString();
+    // --- End Build the target URL ---
 
-    // Use pushState or replaceState to update the URL
-    const historyMethod = usePushState ? history.pushState : history.replaceState;
-    historyMethod.call(history, params, '', url); // Update history state and URL bar
 
-    // console.log(`URL ${usePushState ? 'pushed' : 'replaced'}: ${url.toString()}`); // Debug log
+    // Only push state if the new URL is different from the current one, OR if forcePush is true
+    if (forcePush || newUrlString !== window.location.href) {
+        // Use pushState to add a new entry to the browser's history
+        history.pushState(
+            params, // Store the parameters object as the state associated with this history entry
+            '',     // title (currently unused by browsers, but required)
+            newUrlString // The new URL to display
+        );
+        console.log(`URL pushed: ${newUrlString}`); // Log for debugging
+    } else {
+         console.log(`URL не изменился, pushState пропущен: ${newUrlString}`); // Log if skipped
+    }
 
   } catch (error) {
       console.error("Ошибка обновления URL:", error);
