@@ -5,13 +5,680 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="icon" href="data:;base64,iVBORw0KGgo=">
   <title>Gallery</title>
-  <!-- Подключение Awesomplete CSS (CDN или локально) -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/awesomplete/1.1.5/awesomplete.min.css">
-  <!-- Подключение собственных стилей -->
-  <link rel="stylesheet" href="css/style.css">
+  <style>
+    :root {
+      --c-bg: #1a1f1a;
+      --c-bg-alt: #232923;
+      --c-text: #e0e0e0;
+      --c-link: #4ade80;
+      --c-border: #374537;
+      --c-hover: #34d399;
+      --c-pastel-green: #98fb98;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Inter', system-ui, sans-serif;
+      background: var(--c-bg);
+      color: var(--c-text);
+      font-size: 14px;
+      line-height: 1.6;
+    }
+
+    .hero-section {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      text-align: center;
+      padding: 20px;
+    }
+
+    .hero-content {
+      max-width: 800px;
+      width: 100%;
+      padding: 40px;
+    }
+
+    .hero-title {
+      font-size: 3.5em;
+      color: var(--c-link);
+      margin-bottom: 30px;
+      font-weight: 800;
+      letter-spacing: -1px;
+    }
+
+    /* --- Awesomplete Styles --- */
+    .awesomplete {
+        width: 100%;
+        display: block;
+    }
+
+    /* Style the input *directly* within the .search-container */
+    .search-container input[type="text"] {
+        width: 100%;
+        /* Increased right padding to prevent text overlap with button */
+        padding: 12px 48px 12px 12px;
+        background: var(--c-bg);
+        border: 1px solid var(--c-border);
+        color: var(--c-text);
+        border-radius: 6px;
+        font-size: 16px;
+        box-sizing: border-box;
+    }
+
+     /* Style the input *when Awesomplete has wrapped it* */
+    .awesomplete > input {
+       display: block;
+       width: 100%;
+    }
+
+    .awesomplete > ul {
+      background: var(--c-bg-alt);
+      border: 1px solid var(--c-border);
+      border-top: none;
+      border-radius: 0 0 6px 6px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+      margin: 0;
+      padding: 8px 0;
+      max-height: 300px;
+      overflow-y: auto;
+      position: absolute;
+      width: 100%;
+      left: 0;
+      top: 100%;
+      z-index: 1001;
+      animation: scaleIn 0.15s ease;
+      box-sizing: border-box;
+    }
+
+    .awesomplete > ul > li {
+      color: var(--c-text);
+      padding: 8px 16px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      list-style: none;
+      line-height: 1.4;
+      box-sizing: border-box;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .awesomplete > ul > li:hover,
+    .awesomplete > ul > li[aria-selected="true"] {
+      background: var(--c-link);
+      color: var(--c-bg);
+    }
+
+    .awesomplete mark {
+      background: rgba(74, 222, 128, 0.3);
+      color: inherit;
+      padding: 0;
+    }
+
+    @keyframes scaleIn {
+      from {
+        opacity: 0;
+        transform: translateY(-3px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .awesomplete .visually-hidden {
+       position: absolute !important;
+       clip: rect(1px, 1px, 1px, 1px) !important;
+       padding: 0 !important;
+       border: 0 !important;
+       height: 1px !important;
+       width: 1px !important;
+       overflow: hidden !important;
+    }
+
+    .awesomplete [aria-selected="false"]:empty {
+      display: none !important;
+    }
+    /* --- End Awesomplete Styles --- */
+
+    .main-interface {
+      display: none;
+    }
+
+    .show-interface .main-interface {
+      display: block;
+    }
+
+    .show-interface .hero-section {
+      display: none;
+    }
+
+    #header {
+      background: var(--c-bg-alt);
+      border-bottom: 2px solid var(--c-border);
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .header-content {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 15px 30px;
+      gap: 20px;
+      flex-wrap: wrap;
+    }
+
+    #site-title {
+      color: var(--c-link);
+      font-size: 2em;
+      font-weight: 700;
+      margin: 0;
+      white-space: nowrap;
+      flex-shrink: 0;
+      cursor: pointer;
+    }
+
+    .tag-search {
+      flex-grow: 1;
+      min-width: 250px;
+      max-width: 600px;
+      position: relative;
+    }
+
+    .search-container {
+      position: relative; /* Needed for positioning button */
+    }
+
+     /* --- Centering Search Button --- */
+    .search-button {
+        position: absolute;
+        right: 0;       /* Align to the right edge of container */
+        top: 0;         /* Align to the top edge of container */
+        height: 100%;   /* Make button same height as input */
+        display: flex;          /* Use flexbox for centering icon */
+        align-items: center;    /* Center icon vertically */
+        justify-content: center; /* Center icon horizontally */
+        padding: 0 12px;       /* Space around the icon */
+        border: none;
+        background: none;
+        cursor: pointer;
+        color: var(--c-text);
+        z-index: 2;             /* Ensure button is above input */
+        width: auto;            /* Allow padding to determine width */
+        transition: color 0.2s ease; /* Add transition for hover effect */
+    }
+
+    .search-button svg {
+        width: 20px;  /* Adjust size as needed */
+        height: 20px; /* Adjust size as needed */
+        display: block; /* Prevents potential extra space below SVG */
+        fill: currentColor;
+    }
+     /* --- End Centering Search Button --- */
+
+    .search-button:hover {
+      color: var(--c-link);
+    }
+
+    .container {
+      display: flex;
+      gap: 30px;
+      padding: 30px;
+      max-width: 1800px;
+      margin: 0 auto;
+    }
+
+    .sidebar {
+      width: 280px;
+      background: var(--c-bg-alt);
+      padding: 20px;
+      border-radius: 8px;
+      height: fit-content;
+      position: sticky;
+      top: 100px;
+      transition: transform 0.3s ease;
+    }
+
+    .sidebar-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 15px;
+    }
+
+    .close-sidebar {
+      background: none;
+      border: none;
+      color: var(--c-text);
+      cursor: pointer;
+      font-size: 24px;
+      padding: 0 5px;
+      line-height: 1;
+    }
+
+    .close-sidebar:hover {
+      color: var(--c-link);
+    }
+
+    .sidebar h5 {
+      color: var(--c-link);
+      margin: 0;
+      font-size: 1.1em;
+    }
+
+    .sidebar ul {
+      list-style: none;
+    }
+
+    .sidebar li {
+      margin: 10px 0;
+    }
+
+    .sidebar a {
+      color: var(--c-text);
+      text-decoration: none;
+      transition: color 0.3s;
+    }
+
+    .sidebar a:hover {
+      color: var(--c-link);
+    }
+
+    .image-list {
+      flex: 1;
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+      gap: 12px;
+      align-items: start;
+    }
+
+    .thumb {
+      background: var(--c-bg-alt);
+      border-radius: 8px;
+      overflow: hidden;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      border: 2px solid transparent;
+      max-height: 240px;
+      position: relative;
+    }
+
+    .thumb[data-media-type="video"],
+    .thumb[data-media-type="gif"] {
+      border-color: var(--c-pastel-green);
+    }
+
+    .thumb[data-aspect-ratio="tall"] {
+      max-height: 320px;
+    }
+
+    .thumb:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 8px 15px rgba(0, 0, 0, 0.2);
+    }
+
+    .thumb img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: top center;
+      cursor: pointer;
+      transition: transform 0.3s ease;
+    }
+
+    .thumb[data-aspect-ratio="tall"] img {
+      object-fit: contain;
+      object-position: top;
+    }
+
+    .thumb:hover img {
+      transform: scale(1.05);
+    }
+
+    .media-view {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.9);
+      display: none;
+      justify-content: center;
+      align-items: center;
+      z-index: 1000;
+      padding: 20px;
+    }
+
+    .media-view.active {
+      display: flex;
+    }
+
+    .media-content {
+      max-width: 90%;
+      max-height: 90vh;
+      position: relative;
+      background: var(--c-bg-alt);
+      border-radius: 12px;
+      overflow: auto;
+      width: auto;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 20px;
+    }
+
+    .media-content img,
+    .media-content video {
+      max-width: 100%;
+      max-height: 80vh;
+      width: auto;
+      height: auto;
+      object-fit: contain;
+      margin: 0 auto 20px auto;
+      display: block;
+    }
+
+    .media-info {
+      padding: 20px;
+      background: var(--c-bg-alt);
+      width: 100%;
+      box-sizing: border-box;
+      overflow-wrap: break-word;
+    }
+
+    .tag-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin: 10px 0;
+      justify-content: flex-start;
+      max-width: 100%;
+    }
+
+    .tag-list.collapsed .tag:nth-child(n+11) {
+      display: none;
+    }
+
+    .tag {
+      background: var(--c-bg);
+      color: var(--c-text);
+      padding: 4px 10px;
+      border-radius: 4px;
+      font-size: 12px;
+      border: none;
+      cursor: pointer;
+      transition: all 0.3s;
+      white-space: nowrap;
+      max-width: 100%;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .tag:hover {
+      background: var(--c-link);
+      color: var(--c-bg);
+    }
+
+    .close-btn {
+      position: absolute;
+      top: 15px;
+      right: 15px;
+      background: none;
+      border: none;
+      color: var(--c-text);
+      font-size: 24px;
+      cursor: pointer;
+      z-index: 1001;
+      padding: 5px;
+      line-height: 1;
+    }
+     .close-btn:hover {
+        color: var(--c-link);
+     }
+
+    .comments-section {
+      padding: 20px;
+      background: var(--c-bg);
+      border-radius: 8px;
+      margin-top: 15px;
+      width: 100%;
+      max-width: 1600px;
+      box-sizing: border-box;
+    }
+     .comments-section h4 {
+        color: var(--c-link);
+        margin-bottom: 15px;
+     }
+
+    .comment {
+      padding: 12px 0;
+      border-bottom: 1px solid var(--c-border);
+      word-wrap: break-word;
+      overflow-wrap: break-word;
+      hyphens: auto;
+      white-space: normal;
+      text-align: left;
+      line-height: 1.5;
+      margin: 8px 0;
+    }
+    .comment:last-child {
+        border-bottom: none;
+    }
+
+    .comment strong {
+      display: block;
+      margin-bottom: 4px;
+      color: var(--c-link);
+      font-size: 0.95em;
+    }
+
+    #paginator {
+      margin: 30px 0;
+      text-align: center;
+    }
+
+    .pagination {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    .pagination a, .pagination span {
+      padding: 8px 12px;
+      border: 1px solid var(--c-border);
+      border-radius: 6px;
+      text-decoration: none;
+      color: var(--c-text);
+      transition: all 0.3s;
+      background: var(--c-bg-alt);
+      min-width: 40px;
+      text-align: center;
+    }
+
+    .pagination a:hover {
+      background: var(--c-link);
+      border-color: var(--c-link);
+      color: var(--c-bg);
+    }
+
+    #currentPage {
+      border: 1px solid var(--c-border);
+      border-radius: 6px;
+      outline: none;
+      transition: all 0.3s;
+      cursor: text;
+      background: var(--c-bg);
+      min-width: 50px;
+      padding: 8px 12px;
+      display: inline-block;
+      color: var(--c-text);
+      text-align: center;
+    }
+
+    #currentPage:focus {
+      border-color: var(--c-link);
+      box-shadow: 0 0 0 2px rgba(74, 222, 128, 0.2);
+    }
+
+    .show-more-tags {
+      background: var(--c-link);
+      color: var(--c-bg);
+      border: none;
+      padding: 6px 12px;
+      border-radius: 4px;
+      cursor: pointer;
+      margin-top: 8px;
+      font-size: 12px;
+      align-self: flex-start;
+      transition: background-color 0.3s;
+    }
+
+    .show-more-tags:hover {
+      background: var(--c-hover);
+    }
+
+    /* Responsive Adjustments */
+    @media (max-width: 768px) {
+      body {
+        font-size: 13px;
+      }
+      .container {
+        flex-direction: column;
+        padding: 15px;
+        gap: 15px;
+      }
+
+      .header-content {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 10px;
+        padding: 15px;
+      }
+
+      #site-title {
+        font-size: 1.5em;
+        text-align: center;
+      }
+
+      .tag-search {
+        width: 100%;
+        max-width: 100%;
+      }
+
+      .sidebar {
+        width: 100%;
+        position: static;
+        margin-bottom: 20px;
+      }
+
+      .image-list {
+        grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+        gap: 8px;
+      }
+
+      .thumb {
+        max-height: 180px;
+      }
+       .thumb[data-aspect-ratio="tall"] {
+         max-height: 250px;
+       }
+
+      .media-view {
+        padding: 10px;
+      }
+
+      .media-content {
+         max-width: 100%;
+         max-height: 95vh;
+         padding: 10px;
+      }
+
+      .media-content img,
+      .media-content video {
+        max-height: 70vh;
+        margin-bottom: 10px;
+      }
+
+      .media-info {
+        padding: 15px 10px;
+        font-size: 0.9em;
+      }
+      .comments-section {
+        padding: 15px;
+      }
+
+      #currentPage {
+        padding: 6px 10px;
+        min-width: 40px;
+      }
+
+      .tag-list {
+        justify-content: flex-start;
+        gap: 6px;
+      }
+      .tag {
+        font-size: 11px;
+        padding: 3px 8px;
+      }
+
+      .pagination {
+        gap: 5px;
+      }
+      .pagination a, .pagination span {
+        padding: 6px 10px;
+        min-width: 35px;
+      }
+
+      .awesomplete > ul {
+        max-height: 40vh;
+        font-size: 15px;
+      }
+
+      .awesomplete > ul > li {
+        padding: 10px 14px;
+      }
+
+      .search-container input[type="text"]:focus {
+        border-color: var(--c-link);
+        box-shadow: 0 0 0 2px rgba(74, 222, 128, 0.2);
+      }
+
+      .hero-title {
+        font-size: 2.5em;
+        margin-bottom: 20px;
+      }
+
+      .hero-content {
+        padding: 20px;
+      }
+
+      .comment {
+        padding: 10px 0;
+        font-size: 0.9em;
+      }
+
+      .comment strong {
+        font-size: 0.9em;
+      }
+    }
+
+  </style>
 </head>
 <body>
-  <!-- Hero Section (Начальный экран) -->
   <div class="hero-section">
     <div class="hero-content">
       <h1 class="hero-title">Rule34 Gallery</h1>
@@ -26,7 +693,7 @@
               autocapitalize="none"
               spellcheck="false"
               aria-label="Поиск по тегам"
-              class="awesomplete" <!-- Класс может быть нужен для Awesomplete -->
+              class="awesomplete"
             >
             <button type="submit" class="search-button" aria-label="Начать поиск">
               <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
@@ -39,12 +706,10 @@
     </div>
   </div>
 
-  <!-- Main Interface (Основной интерфейс галереи) -->
   <div class="main-interface">
-    <!-- Header -->
     <div id="header">
       <div class="header-content">
-        <h1 id="site-title">Rule34</h1> <!-- Добавлен id для возможного JS взаимодействия -->
+        <h1 id="site-title" onclick="goHome()">Rule34</h1>
         <div class="tag-search">
           <form onsubmit="searchPosts(); return false;">
             <div class="search-container">
@@ -56,7 +721,7 @@
                 autocapitalize="none"
                 spellcheck="false"
                 aria-label="Поиск по тегам"
-                class="awesomplete" <!-- Класс может быть нужен для Awesomplete -->
+                class="awesomplete"
               >
               <button type="submit" class="search-button" aria-label="Искать">
                 <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
@@ -69,9 +734,7 @@
       </div>
     </div>
 
-    <!-- Main Container (Sidebar + Image List) -->
     <div class="container">
-      <!-- Sidebar -->
       <div class="sidebar" id="sidebar">
         <div class="sidebar-header">
           <h5>Популярные теги</h5>
@@ -82,17 +745,15 @@
           <li><a href="#" onclick="addTagToSearch('animated'); return false;">animated</a></li>
           <li><a href="#" onclick="addTagToSearch('2d'); return false;">2d</a></li>
           <li><a href="#" onclick="addTagToSearch('cute'); return false;">cute</a></li>
-          <!-- Можно добавить больше тегов или загружать динамически -->
+          <!-- Add more popular tags as needed -->
         </ul>
       </div>
 
-      <!-- Image List -->
       <div class="image-list" id="postsContainer">
-          <!-- Изображения будут загружены сюда через JavaScript -->
+          <!-- Posts will be loaded here -->
       </div>
     </div>
 
-    <!-- Pagination -->
     <div id="paginator">
       <div class="pagination">
         <a href="#" onclick="changePage(-1); return false;"><</a>
@@ -105,19 +766,635 @@
         <a href="#" onclick="changePage(1); return false;">></a>
       </div>
     </div>
-  </div> <!-- End Main Interface -->
+  </div>
 
-  <!-- Media View (Окно просмотра изображения/видео) -->
   <div class="media-view" id="mediaView">
     <button class="close-btn" onclick="closeMediaView()" aria-label="Закрыть просмотр">×</button>
     <div class="media-content" id="mediaContent">
-        <!-- Медиа (изображение/видео) и информация будут загружены сюда -->
+        <!-- Media (image/video) and info will be loaded here -->
     </div>
   </div>
 
-  <!-- Подключение Awesomplete JS (CDN или локально) -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/awesomplete/1.1.5/awesomplete.min.js"></script>
-  <!-- Подключение основного файла JavaScript (атрибут defer важен) -->
-  <script src="js/main.js" defer></script>
+  <script>
+    let currentPage = 0;
+    const postsPerPage = 42;
+    let sortedTagData = [];
+    let currentPosts = [];
+    let isLoading = false;
+
+    const mainSearchInput = document.getElementById('mainSearchInput');
+    const tagsInput = document.getElementById('tagsInput');
+    const postsContainer = document.getElementById('postsContainer');
+    const mediaView = document.getElementById('mediaView');
+    const mediaContent = document.getElementById('mediaContent');
+    const currentPageSpan = document.getElementById('currentPage');
+    const sidebar = document.getElementById('sidebar');
+
+    // --- Initialization ---
+
+    document.addEventListener('DOMContentLoaded', async () => {
+      try {
+        if (localStorage.getItem('sidebarHidden') === 'true') {
+          sidebar.style.display = 'none';
+        }
+
+        await loadAndPrepareTags();
+        initializeAwesomplete(mainSearchInput, sortedTagData);
+        initializeAwesomplete(tagsInput, sortedTagData);
+
+        await handleInitialLoad();
+
+      } catch (error) {
+        console.error('Глобальная ошибка инициализации:', error);
+        postsContainer.innerHTML = '<p style="color: red; text-align: center;">Ошибка загрузки приложения. Попробуйте обновить страницу.</p>';
+      }
+    });
+
+    async function loadAndPrepareTags() {
+        console.log('Загрузка тегов...');
+        let currentFile = 1;
+        const allTagsRaw = [];
+        const MAX_TAG_FILES = 20; // Adjust if you have more files
+
+        // Assuming tags are in a subfolder relative to the HTML file
+        const tagsBaseUrl = 'tags8/'; // Make sure this path is correct
+
+        while (currentFile <= MAX_TAG_FILES) {
+            try {
+                const response = await fetch(`${tagsBaseUrl}tags_${currentFile}.json`);
+                if (!response.ok) {
+                    if (response.status === 404 && currentFile > 1) {
+                        console.log(`Файл tags_${currentFile}.json не найден, завершение загрузки тегов.`);
+                        break; // Stop if file not found (and it's not the first one)
+                    }
+                    throw new Error(`HTTP error! status: ${response.status} for tags_${currentFile}.json`);
+                }
+                const data = await response.json();
+                const validTags = data.filter(item =>
+                    item?.name && typeof item.name === 'string' && // Ensure name is a non-empty string
+                    item.count !== undefined && !isNaN(Number(item.count)) // Ensure count is present and numeric
+                );
+                allTagsRaw.push(...validTags);
+                currentFile++;
+            } catch (e) {
+                console.error(`Ошибка загрузки или парсинга ${tagsBaseUrl}tags_${currentFile}.json:`, e);
+                if (currentFile === 1) {
+                     console.warn("Не удалось загрузить базовый файл тегов. Автодополнение будет недоступно.");
+                }
+                break; // Stop on error
+            }
+        }
+
+        if (allTagsRaw.length > 0) {
+            // Process and sort
+            sortedTagData = allTagsRaw
+                .map(tag => ({
+                    label: tag.name.trim().replace(/_/g, ' '), // Use label for display (with spaces)
+                    value: tag.name.trim(), // Use value for searching (original with underscores)
+                    count: Number(tag.count)
+                }))
+                .filter(tag => tag.value.length > 0) // Remove empty tags after trimming
+                .sort((a, b) => b.count - a.count); // Sort by count descending
+
+            console.log(`Загружено и отсортировано ${sortedTagData.length} тегов.`);
+        } else {
+            console.warn('Теги не загружены или массив тегов пуст.');
+        }
+    }
+
+    function initializeAwesomplete(inputElement, tagDataList) {
+        if (!inputElement) {
+            console.error("Input element for Awesomplete not found");
+            return null;
+        }
+        if (!tagDataList || tagDataList.length === 0) {
+             console.warn("Tag list for Awesomplete is empty, skipping initialization for", inputElement.id);
+             return null;
+        }
+
+        return new Awesomplete(inputElement, {
+            list: tagDataList,
+            minChars: 2,
+            maxItems: 15,
+            autoFirst: true,
+            sort: false, // Use pre-sorted list
+
+            filter: function (suggestion, userInput) {
+                const currentTagInput = userInput.substring(userInput.lastIndexOf(' ') + 1).toLowerCase();
+                 if (currentTagInput.length < this.minChars) {
+                    return false;
+                 }
+                return suggestion.value.toLowerCase().startsWith(currentTagInput);
+            },
+
+            item: function (suggestion, userInput) {
+                const currentTagInput = userInput.substring(userInput.lastIndexOf(' ') + 1).toLowerCase();
+                const suggestionValue = suggestion.value;
+                const suggestionLabel = suggestion.label;
+
+                const li = document.createElement("li");
+                li.setAttribute("role", "option");
+                li.setAttribute("aria-selected", "false");
+                li.dataset.value = suggestionValue;
+
+                const matchIndex = suggestionValue.toLowerCase().indexOf(currentTagInput);
+                if (matchIndex === 0) { // Should always be 0 due to startsWith filter
+                    li.innerHTML = suggestionLabel.substring(0, currentTagInput.length) +
+                                   "<mark>" + suggestionLabel.substring(currentTagInput.length) + "</mark>";
+                } else {
+                    // Fallback - shouldn't happen with startsWith but good practice
+                    li.innerHTML = "<mark>" + suggestionLabel + "</mark>";
+                }
+                return li;
+            },
+
+            replace: function (suggestion) {
+                const before = this.input.value.substring(0, this.input.value.lastIndexOf(' ') + 1);
+                this.input.value = before + suggestion.value + " "; // Replace current fragment and add space
+            }
+        });
+    }
+
+
+    // --- Navigation and Search ---
+
+    function startSearch(event) {
+      event.preventDefault();
+      tagsInput.value = mainSearchInput.value.trim();
+      document.body.classList.add('show-interface');
+      currentPage = 0;
+      searchPosts();
+    }
+
+    function goHome() {
+        tagsInput.value = '';
+        mainSearchInput.value = '';
+        document.body.classList.remove('show-interface');
+        currentPage = 0;
+        updateURL({ tags: undefined, page: undefined, s: undefined, id: undefined });
+        postsContainer.innerHTML = '';
+        closeMediaView();
+        history.pushState({}, '', window.location.pathname); // Clean URL to base path
+    }
+
+    async function searchPosts(tagsToSearch = null) {
+        if (isLoading) {
+            console.log("Поиск уже выполняется.");
+            return;
+        }
+        isLoading = true;
+        postsContainer.innerHTML = '<p style="text-align: center; padding: 40px;">Загрузка...</p>';
+
+        const tags = (tagsToSearch !== null ? tagsToSearch : tagsInput.value).trim().replace(/\s+/g, ' ');
+        currentPage = Math.max(0, currentPage);
+
+        updateURL({
+            tags: tags ? tags.replace(/ /g, '+') : undefined,
+            page: currentPage > 0 ? currentPage : undefined, // Don't show page=0 in URL
+            s: 'list',
+            id: undefined // Clear ID when listing
+        });
+
+        const apiUrl = `https://api.rule34.xxx/index.php?page=dapi&s=post&q=index&json=1&limit=${postsPerPage}&tags=${encodeURIComponent(tags)}&pid=${currentPage}`;
+
+        try {
+            const response = await fetch(apiUrl);
+            if (!response.ok) {
+                 let errorMsg = `Ошибка сети: ${response.status} ${response.statusText}`;
+                 try {
+                     const errorData = await response.json();
+                     errorMsg = errorData.message || errorMsg;
+                 } catch (e) { /* ignore json parse error */ }
+                 throw new Error(errorMsg);
+            }
+
+            const responseText = await response.text();
+            let posts = [];
+            if (responseText.trim() === '' || responseText.trim() === '[]') {
+                 posts = [];
+            } else {
+                 try {
+                     posts = JSON.parse(responseText);
+                     // Ensure it's an array even if API returns single object
+                     if (!Array.isArray(posts)) {
+                         posts = posts ? [posts] : [];
+                     }
+                 } catch (e) {
+                     console.error("Ошибка парсинга JSON:", e, "Ответ:", responseText);
+                     throw new Error("Некорректный ответ от сервера.");
+                 }
+            }
+
+            currentPosts = posts; // Store current posts
+
+            if (!posts || posts.length === 0) {
+                postsContainer.innerHTML =
+                    `<p style="text-align: center; font-size: 1.2em; color: var(--c-text); padding: 40px;">
+                        По вашему запросу "${tags || 'все посты'}" ничего не найдено ${currentPage > 0 ? `на странице ${currentPage + 1}`: ''}.
+                    </p>`;
+            } else {
+                displayPosts(posts);
+            }
+            updatePaginator();
+
+        } catch (error) {
+            console.error('Ошибка при получении постов:', error);
+            postsContainer.innerHTML = `<p style="color: red; text-align: center; padding: 40px;">Ошибка загрузки постов: ${error.message}. Попробуйте еще раз.</p>`;
+        } finally {
+            isLoading = false;
+            window.scrollTo(0, 0); // Scroll to top after loading
+        }
+    }
+
+    function displayPosts(posts) {
+      postsContainer.innerHTML = '';
+      posts.forEach(post => {
+        if (!post || !post.preview_url || !post.id || typeof post.width === 'undefined' || typeof post.height === 'undefined') {
+            console.warn("Пропуск поста из-за отсутствия данных:", post);
+            return;
+        }
+
+        const thumb = document.createElement('div');
+        thumb.className = 'thumb';
+
+        const mediaType = getMediaType(post);
+        thumb.dataset.mediaType = mediaType;
+
+        const aspectRatio = post.width / post.height;
+        thumb.dataset.aspectRatio = aspectRatio < 0.75 ? 'tall' :
+                                    aspectRatio > 1.5 ? 'wide' : 'normal';
+
+        const img = document.createElement('img');
+        img.src = post.preview_url;
+        img.alt = `Preview for post ${post.id}`;
+        img.loading = 'lazy';
+        img.style.aspectRatio = `${post.width}/${post.height}`;
+        img.onclick = () => openMediaView(post);
+
+        thumb.appendChild(img);
+        postsContainer.appendChild(thumb);
+      });
+    }
+
+    function getMediaType(post) {
+        if (!post || !post.file_url) return 'image';
+        const url = post.file_url.toLowerCase();
+        const extension = url.split('.').pop()?.split(/[#?]/)[0] || '';
+
+        if (extension === 'gif') return 'gif';
+        if (['mp4', 'webm', 'mov', 'avi', 'wmv', 'mkv', 'flv', 'gifv'].includes(extension)) return 'video';
+        return 'image';
+    }
+
+
+    // --- Media View ---
+
+    async function openMediaView(post) {
+        if (!post || !post.id) return;
+
+        updateURL({
+            s: 'view',
+            id: post.id,
+            tags: tagsInput.value.trim().replace(/ /g, '+') || undefined,
+            page: currentPage > 0 ? currentPage : undefined
+        });
+
+        document.body.style.overflow = 'hidden';
+        mediaContent.innerHTML = '<p>Загрузка медиа...</p>';
+        mediaView.classList.add('active');
+
+        try {
+            let fullPostData = post;
+            if (!post.tags || !post.file_url) {
+                console.log("Неполные данные поста, загрузка полной информации для ID:", post.id);
+                fullPostData = await fetchPostById(post.id);
+                if (!fullPostData) {
+                    throw new Error("Не удалось загрузить детали поста.");
+                }
+                const postIndex = currentPosts.findIndex(p => p.id == post.id);
+                if (postIndex > -1) currentPosts[postIndex] = fullPostData;
+            }
+
+            const mediaType = getMediaType(fullPostData);
+
+            // --- MODIFIED VIDEO TAG (removed 'muted' and 'loop') ---
+            const mediaElementHtml = mediaType === 'video'
+                ? `<video controls autoplay playsinline src="${fullPostData.file_url}" type="video/${fullPostData.file_url.split('.').pop()}">Ваш браузер не поддерживает видео.</video>`
+                : `<img src="${fullPostData.file_url}" alt="Full size post ${fullPostData.id}">`;
+            // --- END MODIFIED VIDEO TAG ---
+
+            const comments = await fetchComments(fullPostData.id);
+            const tags = (fullPostData.tags || '').split(' ').filter(t => t.trim());
+
+            mediaContent.innerHTML = `
+                ${mediaElementHtml}
+                <div class="media-info">
+                  <div class="tag-list ${tags.length > 10 ? 'collapsed' : ''}">
+                    ${tags.map(tag => `<button class="tag" onclick="replaceSearchWithTag('${tag.replace(/'/g, "\\'")}')">${tag.replace(/_/g, ' ')}</button>`).join('')}
+                    ${tags.length > 10 ?
+                      `<button class="show-more-tags" onclick="expandTags(this)">
+                        Показать ещё (${tags.length - 10})
+                      </button>` : ''}
+                  </div>
+                  <div class="comments-section">
+                    <h4>Комментарии (${comments.length}):</h4>
+                    ${comments.length ?
+                      comments.map(c => `
+                        <div class="comment">
+                          <strong>${c.owner || 'Аноним'}:</strong>
+                          <span class="comment-text">${sanitizeHtml(c.body)}</span>
+                        </div>
+                      `).join('') : '<p>Комментариев пока нет.</p>'}
+                  </div>
+                </div>
+            `;
+
+            // Try to play video automatically (browser might block if unmuted initially)
+            const videoElement = mediaContent.querySelector('video');
+            if (videoElement) {
+                 try {
+                     // Autoplay is already set, browser will attempt to play.
+                     // If blocked due to sound, user interaction (like clicking play) is needed.
+                     console.log("Попытка автовоспроизведения видео...");
+                     // videoElement.play(); // Explicit play call might be redundant with 'autoplay' but can help in some cases
+                 } catch (err) {
+                     console.warn("Автовоспроизведение видео (возможно, со звуком) заблокировано браузером:", err);
+                 }
+            }
+
+             mediaView.focus(); // Focus the view for keyboard controls
+
+        } catch (error) {
+            console.error("Ошибка при открытии медиа:", error);
+            mediaContent.innerHTML = `<p style="color: red;">Ошибка загрузки медиа: ${error.message}</p>`;
+        }
+    }
+
+    function closeMediaView() {
+        // Restore previous URL state (list view)
+        updateURL({
+            s: 'list',
+            id: undefined,
+            tags: tagsInput.value.trim().replace(/ /g, '+') || undefined,
+            page: currentPage > 0 ? currentPage : undefined
+        });
+
+        const video = mediaContent.querySelector('video');
+        if (video) {
+            video.pause();
+            video.removeAttribute('src'); // Prevent further loading
+            video.load(); // Reset the video element state
+        }
+        mediaView.classList.remove('active');
+        document.body.style.overflow = ''; // Restore scrolling
+        mediaContent.innerHTML = ''; // Clear content
+    }
+
+    async function fetchPostById(postId) {
+        if (!postId) return null;
+        const url = `https://api.rule34.xxx/index.php?page=dapi&s=post&q=index&json=1&id=${postId}`;
+        try {
+            const response = await fetch(url);
+            if (!response.ok) throw new Error(`Network response was not ok (${response.status})`);
+            // Handle cases where API might return non-JSON on error or empty object/array
+            const responseText = await response.text();
+            if (!responseText) return null;
+            const posts = JSON.parse(responseText);
+            return (Array.isArray(posts) && posts.length > 0) ? posts[0] : (posts && typeof posts === 'object' && !Array.isArray(posts) && Object.keys(posts).length > 0 ? posts : null);
+        } catch (error) {
+            console.error(`Ошибка при загрузке поста ID ${postId}:`, error);
+            return null;
+        }
+    }
+
+    async function fetchComments(postId) {
+        const url = `https://api.rule34.xxx/index.php?page=dapi&s=comment&q=index&post_id=${postId}`;
+        try {
+            const response = await fetch(url);
+            if (!response.ok) throw new Error(`Ошибка сети при загрузке комментариев (${response.status})`);
+            const text = await response.text();
+
+            if (!text || text.trim() === '' || text.includes('<comments/>')) {
+                return [];
+            }
+
+            const parser = new DOMParser();
+            const xmlDoc = parser.parseFromString(text, "application/xml");
+
+             const parserError = xmlDoc.querySelector("parsererror");
+             if (parserError) {
+                 console.error("Ошибка парсинга XML комментариев:", parserError.textContent);
+                 throw new Error("Не удалось обработать ответ комментариев.");
+             }
+
+            const commentElements = xmlDoc.getElementsByTagName('comment');
+            return Array.from(commentElements).map(el => ({
+                owner: el.getAttribute('creator') || 'Аноним',
+                body: el.getAttribute('body') || ''
+            })).filter(c => c.body.trim() !== ''); // Filter out potentially empty comments
+        } catch (error) {
+            console.error(`Ошибка при загрузке комментариев для поста ${postId}:`, error);
+            return []; // Return empty array on error
+        }
+    }
+
+    function sanitizeHtml(str) {
+        if (!str) return '';
+        // Basic sanitization: replace < and > to prevent HTML injection
+        // For more robust sanitization, consider a dedicated library like DOMPurify
+        return str.replace(/</g, '<').replace(/>/g, '>');
+    }
+
+
+    // --- UI Interaction ---
+
+    function changePage(direction) {
+        const potentialNewPage = currentPage + direction;
+        if (potentialNewPage >= 0) { // Prevent going below page 0
+            currentPage = potentialNewPage;
+            searchPosts(); // Will update URL and fetch data
+        }
+    }
+
+    function updatePaginator() {
+        currentPageSpan.textContent = currentPage + 1; // Display 1-based page number
+    }
+
+    function handlePageInput(event) {
+        // Allow only numbers and essential navigation keys
+        if (!/^[0-9]$/.test(event.key) && !['Backspace', 'Delete', 'ArrowLeft', 'ArrowRight', 'Enter', 'Tab'].includes(event.key)) {
+             event.preventDefault();
+        }
+        if (event.key === 'Enter') {
+            event.preventDefault(); // Prevent form submission if inside one
+            updatePageFromInput();
+            event.target.blur(); // Remove focus after entering
+        }
+    }
+
+    function updatePageFromInput() {
+        const pageText = currentPageSpan.textContent.trim();
+        const newPage = parseInt(pageText, 10) - 1; // Input is 1-based, internal is 0-based
+
+        if (!isNaN(newPage) && newPage >= 0 && newPage !== currentPage) {
+            currentPage = newPage;
+            searchPosts(); // Will update URL and fetch data
+        } else {
+            // Reset to current page if input is invalid or unchanged
+            currentPageSpan.textContent = currentPage + 1;
+        }
+    }
+
+    function expandTags(button) {
+        const tagList = button.closest('.tag-list');
+        if (tagList) {
+            tagList.classList.remove('collapsed');
+        }
+        button.remove(); // Remove the "show more" button
+    }
+
+    function toggleSidebar() {
+        const isHidden = sidebar.style.display === 'none';
+        sidebar.style.display = isHidden ? 'block' : 'none';
+        try { // Use try/catch for localStorage in private browsing modes
+            localStorage.setItem('sidebarHidden', !isHidden);
+        } catch (e) {
+            console.warn("Не удалось сохранить состояние сайдбара в localStorage:", e);
+        }
+    }
+
+    function replaceSearchWithTag(tag) {
+        tagsInput.value = tag.trim(); // Replace entire search with this tag
+        currentPage = 0; // Reset to first page
+        closeMediaView(); // Close media if open
+        searchPosts(); // Start search
+    }
+
+    function addTagToSearch(tagToAdd) {
+        const currentTags = tagsInput.value.trim().split(' ').filter(t => t); // Get existing, non-empty tags
+        const tag = tagToAdd.trim();
+        if (tag && !currentTags.includes(tag)) { // Add only if tag is non-empty and not already present
+            currentTags.push(tag);
+            tagsInput.value = currentTags.join(' ');
+            currentPage = 0; // Reset to first page
+            closeMediaView(); // Close media if open
+            searchPosts(); // Start search
+        } else if (!tag) {
+            console.warn("Attempted to add an empty tag.");
+        } else {
+             console.log(`Tag "${tag}" is already in the search.`);
+             tagsInput.focus(); // Focus input to show it's already there
+        }
+    }
+
+
+    // --- URL Handling ---
+
+    function updateURL(params = {}) {
+      try {
+        const url = new URL(window.location);
+
+        // Clear existing relevant parameters first for cleaner update
+        url.searchParams.delete('tags');
+        url.searchParams.delete('page');
+        url.searchParams.delete('id');
+        url.searchParams.delete('s');
+
+        // Add parameters if they have a meaningful value
+        if (params.tags) url.searchParams.set('tags', params.tags);
+        // Allow page=0 in URL, don't set if undefined/null
+        if (params.page !== undefined && params.page !== null) url.searchParams.set('page', params.page);
+        if (params.id) url.searchParams.set('id', params.id);
+        if (params.s) url.searchParams.set('s', params.s);
+
+        // Use replaceState to avoid flooding history for simple updates like pagination/viewing
+        history.replaceState(params, '', url);
+
+      } catch (error) {
+          console.error("Ошибка обновления URL:", error);
+      }
+    }
+
+    function getURLParams() {
+      const params = new URLSearchParams(window.location.search);
+      return {
+        tags: params.get('tags') || '',
+        // Ensure page is a non-negative integer, default to 0
+        page: Math.max(0, parseInt(params.get('page'), 10) || 0),
+        postId: params.get('id') || null,
+        s: params.get('s') || null // 'list' or 'view'
+      };
+    }
+
+    async function handleInitialLoad() {
+        const params = getURLParams();
+
+        // If there are tags or specific view state in URL, show the main interface
+        if (params.tags || params.s === 'list' || params.s === 'view') {
+            document.body.classList.add('show-interface');
+            tagsInput.value = params.tags.replace(/\+/g, ' ').trim(); // Set input from URL
+            currentPage = params.page; // Set current page from URL
+
+            if (params.s === 'view' && params.postId) {
+                // Attempt to load the specific post for viewing
+                const post = await fetchPostById(params.postId);
+                if (post) {
+                    // Add this post to currentPosts so back/forward might potentially work within the view context (if needed)
+                    currentPosts = [post];
+                    await openMediaView(post); // Open the view directly
+                    // Do not automatically search list view in this case
+                } else {
+                    // Post not found, fall back to list view with tags (if any)
+                    console.warn(`Пост с ID ${params.postId} не найден. Отображение списка.`);
+                    updateURL({s: 'list', id: undefined }); // Correct URL state
+                    await searchPosts(); // Load list based on tags in URL
+                }
+            } else {
+                // Default to list view if tags present or s=list (and not specific view)
+                await searchPosts();
+            }
+        } else {
+            // No relevant params, stay on hero section
+            document.body.classList.remove('show-interface');
+        }
+    }
+
+
+    // --- Event Listeners ---
+
+    // Handle browser back/forward buttons
+    window.addEventListener('popstate', async (event) => {
+        console.log("Popstate event triggered", event.state);
+        // Re-evaluate the URL state when navigating history
+        // handleInitialLoad covers both view and list states based on URL
+        await handleInitialLoad();
+    });
+
+    // Close media view by clicking outside the content area
+    mediaView.addEventListener('click', function(e) {
+      // Check if the click was directly on the overlay (mediaView) and not on its children
+      if (e.target === this) {
+          closeMediaView();
+      }
+    });
+
+    // Close media view with Escape key
+    document.addEventListener('keydown', function(e) {
+      if (e.key === 'Escape' && mediaView.classList.contains('active')) {
+        closeMediaView();
+      }
+      // Optional: Add keyboard navigation (left/right arrows) for media view here
+    });
+
+    // Optional: Handle manual changes to the tagsInput if needed beyond form submission
+    tagsInput.addEventListener('change', () => {
+        // console.log('Tags input changed manually (if needed):', tagsInput.value);
+    });
+
+    // Click site title to go home
+    document.getElementById('site-title').addEventListener('click', goHome);
+
+  </script>
 </body>
 </html>
