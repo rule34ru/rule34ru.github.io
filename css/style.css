@@ -21,7 +21,6 @@ body {
   color: var(--c-text);
   font-size: 14px;
   line-height: 1.6;
-  /* Можно добавить min-height: 100vh; overflow-y: scroll; для предотвращения скачков */
 }
 
 .hero-section {
@@ -65,6 +64,7 @@ body {
     border-radius: 6px;
     font-size: 16px;
     box-sizing: border-box; /* Consistent padding behavior */
+    appearance: none; /* Убираем стандартные стили input, которые могут вызывать появление символа > */
 }
 
  /* Style the input *when Awesomplete has wrapped it* (might be needed depending on Awesomplete version) */
@@ -99,7 +99,7 @@ body {
   color: var(--c-text);
   padding: 8px 16px;
   cursor: pointer;
-  transition: background-color 0.2s ease, color 0.2s ease;
+  transition: background-color 0.2s ease, color: 0.2s ease;
   list-style: none;
   line-height: 1.4;
   box-sizing: border-box;
@@ -203,31 +203,33 @@ body {
 
 .search-container {
   position: relative; /* Needed for positioning button */
+  display: flex; /* Добавляем flex контейнер для управления размером и позицией */
+  align-items: center; /* Выравнивание по вертикали по центру */
 }
 
  /* --- Centering Search Button --- */
 .search-button {
     position: absolute;
     right: 0;       /* Align to the right edge of container */
-    top: 0;         /* Align to the top edge of container */
-    height: 100%;   /* Make button same height as input */
-    display: flex;          /* Use flexbox for centering icon */
-    align-items: center;    /* Center icon vertically */
-    justify-content: center; /* Center icon horizontally */
-    padding: 0 12px;       /* Space around the icon */
+    top: 0;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 12px;
     border: none;
     background: none;
     cursor: pointer;
     color: var(--c-text);
-    z-index: 2;             /* Ensure button is above input */
-    width: auto;            /* Allow padding to determine width */
-    transition: color 0.2s ease; /* Add transition for hover effect */
+    z-index: 2;
+    width: auto;
+    transition: color 0.2s ease;
 }
 
 .search-button svg {
-    width: 20px;  /* Adjust size as needed */
-    height: 20px; /* Adjust size as needed */
-    display: block; /* Prevents potential extra space below SVG */
+    width: 20px;
+    height: 20px;
+    display: block;
     fill: currentColor;
 }
  /* --- End Centering Search Button --- */
