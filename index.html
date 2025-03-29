@@ -7,16 +7,16 @@
   <title>Gallery</title>
   <!-- Подключение Awesomplete CSS (CDN или локально) -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/awesomplete/1.1.5/awesomplete.min.css">
-  <!-- Подключение собственных стилей -->
+  <!-- Подключение стилей CSS (внешний файл) -->
   <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
-  <!-- Hero Section (Начальный экран) -->
+  <!-- Hero Section -->
   <div class="hero-section">
     <div class="hero-content">
       <h1 class="hero-title">Rule34 Gallery</h1>
       <div class="tag-search">
-        <form onsubmit="startSearch(event)">
+        <form onsubmit="startSearch(event)" id="heroSearchForm">
           <div class="search-container">
             <input
               type="text"
@@ -26,27 +26,27 @@
               autocapitalize="none"
               spellcheck="false"
               aria-label="Поиск по тегам"
-              class="awesomplete" <!-- Класс может быть нужен для Awesomplete -->
+              class="awesomplete"
             >
-            <button type="submit" class="search-button" aria-label="Начать поиск">
+            <span class="search-button" aria-label="Начать поиск" onclick="document.getElementById('heroSearchForm').dispatchEvent(new Event('submit'))">
               <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                 <path d="M10 2a8 8 0 0 1 6.32 12.906l5.387 5.387a1 1 0 0 1-1.414 1.414l-5.387-5.387A8 8 0 1 1 10 2zm0 2a6 6 0 1 0 0 12 6 6 0 0 0 0-12z"/>
               </svg>
-            </button>
+            </span>
           </div>
         </form>
       </div>
     </div>
   </div>
 
-  <!-- Main Interface (Основной интерфейс галереи) -->
+  <!-- Main Interface -->
   <div class="main-interface">
     <!-- Header -->
     <div id="header">
       <div class="header-content">
-        <h1 id="site-title">Rule34</h1> <!-- Добавлен id для возможного JS взаимодействия -->
+        <h1 id="site-title">Rule34</h1>
         <div class="tag-search">
-          <form onsubmit="searchPosts(); return false;">
+          <form onsubmit="searchPosts(); return false;" id="mainTagsSearchForm">
             <div class="search-container">
               <input
                 type="text"
@@ -56,20 +56,20 @@
                 autocapitalize="none"
                 spellcheck="false"
                 aria-label="Поиск по тегам"
-                class="awesomplete" <!-- Класс может быть нужен для Awesomplete -->
+                class="awesomplete"
               >
-              <button type="submit" class="search-button" aria-label="Искать">
+              <span class="search-button" aria-label="Искать" onclick="document.getElementById('mainTagsSearchForm').dispatchEvent(new Event('submit'))">
                 <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                   <path d="M10 2a8 8 0 0 1 6.32 12.906l5.387 5.387a1 1 0 0 1-1.414 1.414l-5.387-5.387A8 8 0 1 1 10 2zm0 2a6 6 0 1 0 0 12 6 6 0 0 0 0-12z"/>
                 </svg>
-              </button>
+              </span>
             </div>
           </form>
         </div>
       </div>
     </div>
 
-    <!-- Main Container (Sidebar + Image List) -->
+    <!-- Main Container -->
     <div class="container">
       <!-- Sidebar -->
       <div class="sidebar" id="sidebar">
@@ -82,7 +82,6 @@
           <li><a href="#" onclick="addTagToSearch('animated'); return false;">animated</a></li>
           <li><a href="#" onclick="addTagToSearch('2d'); return false;">2d</a></li>
           <li><a href="#" onclick="addTagToSearch('cute'); return false;">cute</a></li>
-          <!-- Можно добавить больше тегов или загружать динамически -->
         </ul>
       </div>
 
@@ -107,7 +106,7 @@
     </div>
   </div> <!-- End Main Interface -->
 
-  <!-- Media View (Окно просмотра изображения/видео) -->
+  <!-- Media View -->
   <div class="media-view" id="mediaView">
     <button class="close-btn" onclick="closeMediaView()" aria-label="Закрыть просмотр">×</button>
     <div class="media-content" id="mediaContent">
@@ -115,9 +114,9 @@
     </div>
   </div>
 
-  <!-- Подключение Awesomplete JS (CDN или локально) -->
+  <!-- Подключение Awesomplete JS -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/awesomplete/1.1.5/awesomplete.min.js"></script>
-  <!-- Подключение основного файла JavaScript (атрибут defer важен) -->
-  <script src="js/main.js" defer></script>
+  <!-- Подключение основного файла JavaScript -->
+  <script src="js/main.js"></script>
 </body>
 </html>
