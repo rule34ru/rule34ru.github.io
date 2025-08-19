@@ -61,6 +61,24 @@ body {
   width: 100%;
 }
 
+/* Специальные стили для Awesomplete в hero секции */
+.hero-content .awesomplete {
+  width: 100% !important;
+  display: block !important;
+}
+
+.hero-content .awesomplete > input {
+  width: 100% !important;
+  min-width: 300px !important;
+  padding: 12px 48px 12px 12px !important;
+  background: var(--c-bg) !important;
+  border: 1px solid var(--c-border) !important;
+  color: var(--c-text) !important;
+  border-radius: 6px !important;
+  font-size: 16px !important;
+  box-sizing: border-box !important;
+}
+
 /* --- Awesomplete Styles --- */
 .awesomplete {
     width: 100%;
