@@ -49,16 +49,15 @@ body {
 
 /* --- Hero Section Search Centering --- */
 .hero-section .tag-search {
-  width: 100%;
-  max-width: 600px;
-  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 .hero-section .search-container {
   position: relative;
   width: 100%;
   max-width: 500px;
-  margin: 0 auto;
 }
 
 .hero-section .search-container input[type="text"] {
@@ -225,8 +224,7 @@ body {
 
 .search-container {
   position: relative;
-  display: flex;
-  align-items: center;
+  width: 100%;
 }
 
  /* --- Search Button --- */
