@@ -199,6 +199,7 @@ body {
   min-width: 250px; /* Minimum width before wrapping */
   max-width: 600px; /* Maximum width */
   position: relative; /* For Awesomplete positioning */
+  margin: 0 auto;
 }
 
 .search-container {
@@ -717,3 +718,4 @@ body {
     font-size: 0.9em;
   }
 }
+
