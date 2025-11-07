@@ -8,6 +8,10 @@ let currentPosts = [];
 let isLoading = false;
 let awesompleteInstances = {};
 
+// API credentials
+const API_KEY = '7bbb5a0bb5d94c8636f4eed95a0f20291cebbc55eed5d52e32520a11294433f92e33cb7398399889742da08265bebb56aa59e0e31a37949fad3b50e8821aa82c';
+const USER_ID = '5555640';
+
 // --- DOM Element References ---
 const mainSearchInput = document.getElementById('mainSearchInput');
 const tagsInput = document.getElementById('tagsInput');
@@ -72,9 +76,9 @@ async function loadAndPrepareTags() {
             const data = await response.json();
 
             if (!Array.isArray(data)) {
-                 console.warn(`Данные в ${filePath} не являются массивом. Файл пропущен.`);
-                 currentFile++;
-                 continue;
+                console.warn(`Данные в ${filePath} не являются массивом. Файл пропущен.`);
+                currentFile++;
+                continue;
             }
 
             const validTags = data.filter(item =>
@@ -88,7 +92,7 @@ async function loadAndPrepareTags() {
         } catch (e) {
             console.error(`Ошибка загрузки или парсинга ${filePath}:`, e);
             if (currentFile === 1) {
-                 console.warn("Не удалось загрузить базовый файл тегов (tags_1.json). Автодополнение будет недоступно.");
+                console.warn("Не удалось загрузить базовый файл тегов (tags_1.json). Автодополнение будет недоступно.");
             }
             break;
         }
@@ -117,8 +121,8 @@ function initializeAwesomplete(inputElement, tagDataList) {
         return null;
     }
     if (!tagDataList || tagDataList.length === 0) {
-         console.warn(`Список тегов пуст, Awesomplete не инициализирован для #${inputElement.id}.`);
-         return null;
+        console.warn(`Список тегов пуст, Awesomplete не инициализирован для #${inputElement.id}.`);
+        return null;
     }
 
     if (inputElement.awesomplete) {
@@ -148,15 +152,15 @@ function initializeAwesomplete(inputElement, tagDataList) {
 
             try {
                 const label = suggestion.label;
-                 if (label.toLowerCase().startsWith(currentTagInput)) {
+                if (label.toLowerCase().startsWith(currentTagInput)) {
                     li.innerHTML = label.substring(0, currentTagInput.length) +
-                                   "<mark>" + label.substring(currentTagInput.length) + "</mark>";
+                        "<mark>" + label.substring(currentTagInput.length) + "</mark>";
                 } else {
-                     li.innerHTML = `<mark>${label}</mark>`;
+                    li.innerHTML = `<mark>${label}</mark>`;
                 }
-            } catch(e) {
-                 console.error("Ошибка рендеринга элемента Awesomplete:", e, suggestion, userInput);
-                 li.textContent = suggestion.label || suggestion.value;
+            } catch (e) {
+                console.error("Ошибка рендеринга элемента Awesomplete:", e, suggestion, userInput);
+                li.textContent = suggestion.label || suggestion.value;
             }
             return li;
         },
@@ -172,19 +176,19 @@ function initializeAwesomplete(inputElement, tagDataList) {
 
 
 function startSearch(event) {
-  event.preventDefault();
-  if (!tagsInput || !mainSearchInput || !mainInterface) return;
+    event.preventDefault();
+    if (!tagsInput || !mainSearchInput || !mainInterface) return;
 
-  tagsInput.value = mainSearchInput.value.trim();
-  document.body.classList.add('show-interface');
-  currentPage = 0;
-  updateURL({
-      tags: tagsInput.value.trim().replace(/ /g, '+') || undefined,
-      page: undefined,
-      s: 'list',
-      id: undefined
-  }, true);
-  searchPosts();
+    tagsInput.value = mainSearchInput.value.trim();
+    document.body.classList.add('show-interface');
+    currentPage = 0;
+    updateURL({
+        tags: tagsInput.value.trim().replace(/ /g, '+') || undefined,
+        page: undefined,
+        s: 'list',
+        id: undefined
+    }, true);
+    searchPosts();
 }
 
 function goHome() {
@@ -212,8 +216,8 @@ async function searchPosts(tagsToSearch = null) {
         return;
     }
     if (!postsContainer) {
-         console.error("Контейнер для постов (postsContainer) не найден.");
-         return;
+        console.error("Контейнер для постов (postsContainer) не найден.");
+        return;
     }
 
     isLoading = true;
@@ -227,9 +231,9 @@ async function searchPosts(tagsToSearch = null) {
         page: currentPage > 0 ? currentPage : undefined,
         s: 'list',
         id: undefined
-    });
+    }, true); // forcePush = true для создания новой записи при смене страницы
 
-    const apiUrl = `https://api.rule34.xxx/index.php?page=dapi&s=post&q=index&json=1&limit=${postsPerPage}&tags=${encodeURIComponent(tags)}&pid=${currentPage}`;
+    const apiUrl = `https://api.rule34.xxx/index.php?page=dapi&s=post&q=index&json=1&limit=${postsPerPage}&tags=${encodeURIComponent(tags)}&pid=${currentPage}&api_key=${API_KEY}&user_id=${USER_ID}`;
     console.log(`Запрос API: ${apiUrl}`);
 
     try {
@@ -248,18 +252,18 @@ async function searchPosts(tagsToSearch = null) {
         let posts = [];
 
         if (!responseText || responseText.trim() === '' || responseText.trim() === '[]' || responseText.trim() === '{}') {
-             posts = [];
-             console.log("API вернул пустой ответ (нет результатов).");
+            posts = [];
+            console.log("API вернул пустой ответ (нет результатов).");
         } else {
-             try {
-                 posts = JSON.parse(responseText);
-                 if (!Array.isArray(posts)) {
-                     posts = posts && typeof posts === 'object' ? [posts] : [];
-                 }
-             } catch (e) {
-                 console.error("Ошибка парсинга JSON ответа API:", e, "Ответ:", responseText);
-                 throw new Error("Некорректный формат ответа от сервера.");
-             }
+            try {
+                posts = JSON.parse(responseText);
+                if (!Array.isArray(posts)) {
+                    posts = posts && typeof posts === 'object' ? [posts] : [];
+                }
+            } catch (e) {
+                console.error("Ошибка парсинга JSON ответа API:", e, "Ответ:", responseText);
+                throw new Error("Некорректный формат ответа от сервера.");
+            }
         }
 
         currentPosts = posts;
@@ -267,7 +271,7 @@ async function searchPosts(tagsToSearch = null) {
         if (!posts || posts.length === 0) {
             postsContainer.innerHTML =
                 `<p style="text-align: center; font-size: 1.2em; color: var(--c-text); padding: 40px;">
-                    По вашему запросу "${tags || 'все посты'}" ничего не найдено ${currentPage > 0 ? `на странице ${currentPage + 1}`: ''}.
+                    По вашему запросу "${tags || 'все посты'}" ничего не найдено ${currentPage > 0 ? `на странице ${currentPage + 1}` : ''}.
                 </p>`;
         } else {
             displayPosts(posts);
@@ -306,7 +310,7 @@ function displayPosts(posts) {
 
         const aspectRatio = post.width / post.height;
         thumb.dataset.aspectRatio = aspectRatio < 0.75 ? 'tall' :
-                                    aspectRatio > 1.5 ? 'wide' : 'normal';
+            aspectRatio > 1.5 ? 'wide' : 'normal';
 
         const img = document.createElement('img');
         img.src = post.preview_url;
@@ -335,20 +339,8 @@ function getMediaType(post) {
 }
 
 
-async function openMediaView(post) {
-    if (!post || !post.id || !mediaView || !mediaContent) return;
-
-    updateURL({
-        s: 'view',
-        id: post.id,
-        tags: tagsInput.value.trim().replace(/ /g, '+') || undefined,
-        page: currentPage > 0 ? currentPage : undefined
-    });
-
-    document.body.style.overflow = 'hidden';
-    mediaContent.innerHTML = '<p style="padding: 30px; text-align: center;">Загрузка медиа...</p>';
-    mediaView.classList.add('active');
-
+// Helper function to display media content
+async function displayMediaContent(post) {
     try {
         let fullPostData = post;
         if (!post.tags || !post.file_url) {
@@ -368,7 +360,7 @@ async function openMediaView(post) {
         const mediaType = getMediaType(fullPostData);
 
         const mediaElementHtml = mediaType === 'video'
-            ? `<video controls autoplay playsinline preload="metadata" src="${fullPostData.file_url}" type="video/${fullPostData.file_url.split('.').pop() || 'mp4'}">Ваш браузер не поддерживает тег video.</video>`
+            ? `<video controls autoplay playsinline preload="metadata" loop src="${fullPostData.file_url}" type="video/${fullPostData.file_url.split('.').pop() || 'mp4'}">Ваш браузер не поддерживает тег video.</video>`
             : `<img src="${fullPostData.file_url}" alt="Пост ${fullPostData.id}">`;
 
         const comments = await fetchComments(fullPostData.id);
@@ -379,10 +371,10 @@ async function openMediaView(post) {
             <div class="media-info">
               <div class="tag-list ${tags.length > 10 ? 'collapsed' : ''}">
                 ${tags.map(tag =>
-                    `<button class="tag" onclick="replaceSearchWithTag('${tag.replace(/'/g, "\\'")}')">${tag.replace(/_/g, ' ')}</button>`
-                ).join('')}
+            `<button class="tag" onclick="replaceSearchWithTag('${tag.replace(/'/g, "\\'")}')">${tag.replace(/_/g, ' ')}</button>`
+        ).join('')}
                 ${tags.length > 10 ?
-                  `<button class="show-more-tags" onclick="expandTags(this)">
+                `<button class="show-more-tags" onclick="expandTags(this)">
                     Показать ещё (${tags.length - 10})
                   </button>` : ''}
               </div>
@@ -390,13 +382,13 @@ async function openMediaView(post) {
                 <h4>Комментарии (${comments.length}):</h4>
                 <div id="commentList">
                 ${comments.length > 0 ?
-                  comments.map(c => `
+                comments.map(c => `
                     <div class="comment">
                       <strong>${sanitizeHtml(c.owner) || 'Аноним'}:</strong>
                       <span class="comment-text">${sanitizeHtml(c.body)}</span>
                     </div>
                   `).join('')
-                  : '<p>Комментариев пока нет.</p>'}
+                : '<p>Комментариев пока нет.</p>'}
                 </div>
               </div>
             </div>
@@ -404,10 +396,16 @@ async function openMediaView(post) {
 
         const videoElement = mediaContent.querySelector('video');
         if (videoElement) {
-             console.log("Попытка автовоспроизведения видео...");
-             videoElement.play().catch(err => {
-                 console.warn("Автовоспроизведение видео (возможно, со звуком) заблокировано браузером:", err.name, err.message);
-             });
+            console.log("Попытка автовоспроизведения видео...");
+            videoElement.play().catch(err => {
+                console.warn("Автовоспроизведение видео (возможно, со звуком) заблокировано браузером:", err.name, err.message);
+            });
+            videoElement.addEventListener('click', toggleFullscreen);
+        }
+
+        const imageElement = mediaContent.querySelector('img');
+        if (imageElement) {
+            imageElement.addEventListener('click', toggleFullscreen);
         }
 
         mediaView.focus();
@@ -416,6 +414,23 @@ async function openMediaView(post) {
         console.error("Ошибка при открытии/загрузке медиа:", error);
         mediaContent.innerHTML = `<p style="color: red; padding: 30px; text-align: center;">Ошибка загрузки медиа: ${error.message}</p>`;
     }
+}
+
+async function openMediaView(post) {
+    if (!post || !post.id || !mediaView || !mediaContent) return;
+
+    updateURL({
+        s: 'view',
+        id: post.id,
+        tags: tagsInput.value.trim().replace(/ /g, '+') || undefined,
+        page: currentPage > 0 ? currentPage : undefined
+    }, true); // forcePush = true для создания новой записи при открытии поста
+
+    document.body.style.overflow = 'hidden';
+    mediaContent.innerHTML = '<p style="padding: 30px; text-align: center;">Загрузка медиа...</p>';
+    mediaView.classList.add('active');
+
+    await displayMediaContent(post);
 }
 
 function closeMediaView() {
@@ -432,12 +447,6 @@ function closeMediaView() {
     document.body.style.overflow = '';
     mediaContent.innerHTML = '';
 
-    updateURL({
-        s: 'list',
-        id: undefined,
-        tags: tagsInput.value.trim().replace(/ /g, '+') || undefined,
-        page: currentPage > 0 ? currentPage : undefined
-    });
     console.log("Медиа просмотр закрыт.");
 }
 
@@ -446,7 +455,7 @@ async function fetchPostById(postId) {
         console.warn("fetchPostById вызван без ID.");
         return null;
     }
-    const url = `https://api.rule34.xxx/index.php?page=dapi&s=post&q=index&json=1&id=${postId}`;
+    const url = `https://api.rule34.xxx/index.php?page=dapi&s=post&q=index&json=1&id=${postId}&api_key=${API_KEY}&user_id=${USER_ID}`;
     console.log(`Запрос деталей поста ID ${postId}: ${url}`);
     try {
         const response = await fetch(url);
@@ -463,8 +472,8 @@ async function fetchPostById(postId) {
         const postData = Array.isArray(posts) ? posts[0] : (posts && typeof posts === 'object' ? posts : null);
 
         if (!postData || !postData.id) {
-             console.log(`Пост ID ${postId} не найден (невалидный ответ).`);
-             return null;
+            console.log(`Пост ID ${postId} не найден (невалидный ответ).`);
+            return null;
         }
         console.log(`Детали поста ID ${postId} успешно загружены.`);
         return postData;
@@ -477,7 +486,7 @@ async function fetchPostById(postId) {
 
 async function fetchComments(postId) {
     if (!postId) return [];
-    const url = `https://api.rule34.xxx/index.php?page=dapi&s=comment&q=index&post_id=${postId}`;
+    const url = `https://api.rule34.xxx/index.php?page=dapi&s=comment&q=index&post_id=${postId}&api_key=${API_KEY}&user_id=${USER_ID}`;
     console.log(`Запрос комментариев для поста ${postId}: ${url}`);
     try {
         const response = await fetch(url);
@@ -494,11 +503,11 @@ async function fetchComments(postId) {
         const parser = new DOMParser();
         const xmlDoc = parser.parseFromString(text, "application/xml");
 
-         const parserError = xmlDoc.querySelector("parsererror");
-         if (parserError) {
-             console.error("Ошибка парсинга XML комментариев:", parserError.textContent);
-             throw new Error("Не удалось обработать ответ комментариев (ошибка парсинга XML).");
-         }
+        const parserError = xmlDoc.querySelector("parsererror");
+        if (parserError) {
+            console.error("Ошибка парсинга XML комментариев:", parserError.textContent);
+            throw new Error("Не удалось обработать ответ комментариев (ошибка парсинга XML).");
+        }
 
         const commentElements = xmlDoc.getElementsByTagName('comment');
         const comments = Array.from(commentElements).map(el => ({
@@ -572,9 +581,8 @@ function updatePaginator() {
 
 function handlePageInput(event) {
     if (!/^[0-9]$/.test(event.key) &&
-        !['Backspace', 'Delete', 'ArrowLeft', 'ArrowRight', 'Enter', 'Tab', 'Home', 'End'].includes(event.key))
-    {
-         event.preventDefault();
+        !['Backspace', 'Delete', 'ArrowLeft', 'ArrowRight', 'Enter', 'Tab', 'Home', 'End'].includes(event.key)) {
+        event.preventDefault();
     }
     if (event.key === 'Enter') {
         event.preventDefault();
@@ -604,7 +612,7 @@ function expandTags(button) {
         tagList.classList.remove('collapsed');
         console.log("Список тегов развернут.");
     } else {
-         console.warn("Не найден родительский '.tag-list' для кнопки 'Показать ещё'.");
+        console.warn("Не найден родительский '.tag-list' для кнопки 'Показать ещё'.");
     }
     button.remove();
 }
@@ -653,53 +661,60 @@ function addTagToSearch(tagToAdd) {
         console.log(`Тег "${cleanTagToAdd}" добавлен. Новый поиск: ${tagsInput.value}`);
         searchPosts();
     } else {
-         console.log(`Тег "${cleanTagToAdd}" уже присутствует в поиске.`);
-         tagsInput.focus();
+        console.log(`Тег "${cleanTagToAdd}" уже присутствует в поиске.`);
+        tagsInput.focus();
     }
 }
 
 
 // --- URL Handling ---
 
-function updateURL(params = {}, forcePush = false) {
-  try {
-    const url = new URL(window.location);
+function updateURL(params = {}, forcePush = false, useReplace = false) {
+    try {
+        const url = new URL(window.location);
 
-    const managedKeys = ['tags', 'page', 'id', 's'];
+        const managedKeys = ['tags', 'page', 'id', 's'];
 
-    const targetUrl = new URL(window.location);
-    managedKeys.forEach(key => targetUrl.searchParams.delete(key));
-    Object.entries(params).forEach(([key, value]) => {
-        if (managedKeys.includes(key) && value !== undefined && value !== null && value !== '') {
-            targetUrl.searchParams.set(key, value);
+        const targetUrl = new URL(window.location);
+        managedKeys.forEach(key => targetUrl.searchParams.delete(key));
+        Object.entries(params).forEach(([key, value]) => {
+            if (managedKeys.includes(key) && value !== undefined && value !== null && value !== '') {
+                targetUrl.searchParams.set(key, value);
+            }
+        });
+        const newUrlString = targetUrl.toString();
+
+        if (newUrlString !== window.location.href) {
+            if (useReplace) {
+                
+                history.replaceState(params, '', newUrlString);
+                console.log(`URL replaced: ${newUrlString}`);
+            } else if (forcePush) {
+                
+                history.pushState(params, '', newUrlString);
+                console.log(`URL pushed (forced): ${newUrlString}`);
+            } else {
+                
+                history.pushState(params, '', newUrlString);
+                console.log(`URL pushed: ${newUrlString}`);
+            }
+        } else {
+            console.log(`URL не изменился, обновление пропущено: ${newUrlString}`);
         }
-    });
-    const newUrlString = targetUrl.toString();
 
-    if (forcePush || newUrlString !== window.location.href) {
-        history.pushState(
-            params,
-            '',
-            newUrlString
-        );
-        console.log(`URL pushed: ${newUrlString}`);
-    } else {
-         console.log(`URL не изменился, pushState пропущен: ${newUrlString}`);
+    } catch (error) {
+        console.error("Ошибка обновления URL:", error);
     }
-
-  } catch (error) {
-      console.error("Ошибка обновления URL:", error);
-  }
 }
 
 function getURLParams() {
-  const params = new URLSearchParams(window.location.search);
-  return {
-    tags: params.get('tags') ? params.get('tags').replace(/\+/g, ' ') : '',
-    page: Math.max(0, parseInt(params.get('page'), 10) || 0),
-    postId: params.get('id') || null,
-    s: params.get('s') || null
-  };
+    const params = new URLSearchParams(window.location.search);
+    return {
+        tags: params.get('tags') ? params.get('tags').replace(/\+/g, ' ') : '',
+        page: Math.max(0, parseInt(params.get('page'), 10) || 0),
+        postId: params.get('id') || null,
+        s: params.get('s') || null
+    };
 }
 
 async function handleInitialLoad() {
@@ -714,16 +729,26 @@ async function handleInitialLoad() {
 
         if (params.s === 'view' && params.postId) {
             console.log(`Попытка прямого открытия поста ID ${params.postId}`);
+            
+            await searchPosts(params.tags);
+            
             const postToView = await fetchPostById(params.postId);
             if (postToView) {
-                currentPosts = [postToView];
-                await openMediaView(postToView);
+                
+                const postIndex = currentPosts.findIndex(p => p.id == params.postId);
+                if (postIndex === -1) {
+                    currentPosts.unshift(postToView);
+                }
+                
+                document.body.style.overflow = 'hidden';
+                mediaContent.innerHTML = '<p style="padding: 30px; text-align: center;">Загрузка медиа...</p>';
+                mediaView.classList.add('active');
+
+                await displayMediaContent(postToView);
                 console.log("Медиа просмотр открыт по URL.");
-                return;
             } else {
-                console.warn(`Пост ID ${params.postId} из URL не найден. Отображение списка.`);
-                updateURL({ s: 'list', id: undefined, tags: params.tags ? params.tags.replace(/ /g, '+') : undefined, page: params.page > 0 ? params.page : undefined });
-                await searchPosts(params.tags);
+                console.warn(`Пост ID ${params.postId} из URL не найден.`);
+                updateURL({ s: 'list', id: undefined, tags: params.tags ? params.tags.replace(/ /g, '+') : undefined, page: params.page > 0 ? params.page : undefined }, false, true);
             }
         } else {
             console.log("Загрузка списка постов по URL.");
@@ -733,7 +758,7 @@ async function handleInitialLoad() {
         console.log("Параметры поиска/вида в URL не найдены. Отображение главной страницы.");
         document.body.classList.remove('show-interface');
     }
-     updatePaginator();
+    updatePaginator();
 }
 
 
@@ -742,18 +767,25 @@ async function handleInitialLoad() {
 function setupEventListeners() {
     window.addEventListener('popstate', async (event) => {
         console.log("Событие Popstate:", event.state);
+        const params = getURLParams();
+        
+        
+        if (mediaView && mediaView.classList.contains('active') && params.s !== 'view') {
+            closeMediaView();
+        }
+        
         await handleInitialLoad();
     });
 
     if (mediaView) {
-        mediaView.addEventListener('click', function(e) {
+        mediaView.addEventListener('click', function (e) {
             if (e.target === mediaView) {
                 closeMediaView();
             }
         });
     }
 
-    document.addEventListener('keydown', function(e) {
+    document.addEventListener('keydown', function (e) {
         if (e.key === 'Escape' && mediaView && mediaView.classList.contains('active')) {
             closeMediaView();
         }
@@ -765,11 +797,30 @@ function setupEventListeners() {
 
     [mainSearchInput, tagsInput].forEach(input => {
         if (input) {
-            input.addEventListener('awesomplete-selectcomplete', function() {
+            input.addEventListener('awesomplete-selectcomplete', function () {
                 console.log(`Выбрана подсказка Awesomplete для #${input.id}`);
             });
         }
     });
 
     console.log("Основные обработчики событий установлены.");
+}
+
+// --- Fullscreen Toggle ---
+
+function toggleFullscreen(event) {
+    const element = event.target;
+
+    if (!element) return;
+
+    
+    if (element.classList.contains('fullscreen-media')) {
+        
+        element.classList.remove('fullscreen-media');
+        console.log("Выход из полноэкранного режима");
+    } else {
+        
+        element.classList.add('fullscreen-media');
+        console.log("Вход в полноэкранный режим");
+    }
 }

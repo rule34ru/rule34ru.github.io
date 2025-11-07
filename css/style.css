@@ -23,6 +23,34 @@ body {
   line-height: 1.6;
 }
 
+/* Custom Scrollbar Styles */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--c-border) var(--c-bg-alt);
+}
+
+*::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+*::-webkit-scrollbar-track {
+  background: var(--c-bg-alt);
+}
+
+*::-webkit-scrollbar-thumb {
+  background: var(--c-border);
+  border-radius: 5px;
+}
+
+*::-webkit-scrollbar-thumb:hover {
+  background: var(--c-link);
+}
+
+*::-webkit-scrollbar-corner {
+  background: var(--c-bg-alt);
+}
+
 .hero-section {
   display: flex;
   flex-direction: column;
@@ -283,11 +311,11 @@ body {
   background: var(--c-bg-alt);
   padding: 20px;
   border-radius: 8px;
-  height: fit-content; /* Adjust height to content */
+  height: fit-content;
   position: sticky;
-  top: 100px; /* Adjust based on header height + desired gap */
-  transition: transform 0.3s ease; /* For potential future animations */
-  flex-shrink: 0; /* Prevent sidebar from shrinking */
+  top: 100px;
+  transition: transform 0.3s ease;
+  flex-shrink: 0;
 }
 
 .sidebar-header {
@@ -337,23 +365,29 @@ body {
 }
 
 .image-list {
-  flex: 1; /* Take remaining space */
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-  gap: 12px;
-  align-items: start; /* Align items to the start of the track */
+  flex: 1;
+  display: flex;
+  flex-flow: wrap;
+  justify-content: flex-start;
+  align-items: center;
+  align-content: stretch;
+  gap: 10px;
+  width: 100%;
 }
 
 .thumb {
+  width: 200px;
+  height: 200px;
+  display: flex;
+  justify-content: space-around;
+  align-items: stretch;
   background: var(--c-bg-alt);
   border-radius: 8px;
   overflow: hidden;
   transition: all 0.3s ease;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
   border: 2px solid transparent;
-  max-height: 240px; /* Control max height */
-  position: relative; /* For potential overlays */
-  aspect-ratio: 4 / 3; /* Default aspect ratio, can be overridden by img */
+  position: relative;
 }
 
 .thumb[data-media-type="video"],
@@ -361,38 +395,19 @@ body {
   border-color: var(--c-pastel-green);
 }
 
-/* Adjustments for tall images */
-.thumb[data-aspect-ratio="tall"] {
-  max-height: 320px;
-  aspect-ratio: auto; /* Let image define aspect ratio */
-}
-/* Adjustments for wide images (optional) */
-.thumb[data-aspect-ratio="wide"] {
-   /* max-height: 200px; /* Example */
-   aspect-ratio: auto;
-}
-
-
 .thumb:hover {
   transform: translateY(-5px);
   box-shadow: 0 8px 15px rgba(0, 0, 0, 0.2);
 }
 
 .thumb img {
-  display: block; /* Remove potential space below image */
-  width: 100%;
-  height: 100%;
-  object-fit: cover; /* Cover the container */
-  object-position: top center; /* Focus on top for potentially tall previews */
+  max-width: 100%;
+  max-height: 100%;
+  display: block;
+  margin: auto;
   cursor: pointer;
   transition: transform 0.3s ease;
-  aspect-ratio: attr(width) / attr(height); /* Use image's ratio if available */
-}
-
-/* Tall images fit differently */
-.thumb[data-aspect-ratio="tall"] img {
-  object-fit: contain; /* Show the whole image */
-  object-position: top;
+  object-fit: contain;
 }
 
 .thumb:hover img {
@@ -407,26 +422,26 @@ body {
   right: 0;
   bottom: 0;
   background: rgba(0, 0, 0, 0.9);
-  display: none; /* Hidden by default */
+  display: none;
   justify-content: center;
   align-items: center;
-  z-index: 1000; /* Above header, potentially below Awesomplete */
+  z-index: 1000;
   padding: 20px;
   box-sizing: border-box;
 }
 
 .media-view.active {
-  display: flex; /* Show when active */
+  display: flex;
 }
 
 .media-content {
   max-width: 90%;
-  max-height: 90vh; /* Limit height */
+  max-height: 90vh;
   position: relative;
   background: var(--c-bg-alt);
   border-radius: 12px;
-  overflow: auto; /* Allow scrolling if content exceeds limits */
-  width: auto; /* Adjust to content size */
+  overflow: auto;
+  width: auto;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -437,20 +452,38 @@ body {
 .media-content img,
 .media-content video {
   max-width: 100%;
-  max-height: 80vh; /* Limit media height within the modal */
-  width: auto; /* Maintain aspect ratio */
-  height: auto; /* Maintain aspect ratio */
-  object-fit: contain; /* Ensure entire media is visible */
-  margin: 0 auto 20px auto; /* Center and add space below */
+  max-height: 80vh;
+  width: auto;
+  height: auto;
+  object-fit: contain;
+  margin: 0 auto 20px auto;
   display: block;
+  cursor: zoom-in;
+  transition: all 0.3s ease;
+}
+
+/* Fullscreen mode for media */
+.fullscreen-media {
+  position: fixed !important;
+  top: 0 !important;
+  left: 0 !important;
+  width: 100vw !important;
+  height: 100vh !important;
+  max-width: 100vw !important;
+  max-height: 100vh !important;
+  margin: 0 !important;
+  z-index: 10000 !important;
+  background: rgba(0, 0, 0, 0.98) !important;
+  object-fit: contain !important;
+  cursor: zoom-out !important;
 }
 
 .media-info {
   padding: 20px;
-  background: var(--c-bg-alt); /* Same as modal background */
-  width: 100%; /* Take full width of padding box */
+  background: var(--c-bg-alt);
+  width: 100%;
   box-sizing: border-box;
-  overflow-wrap: break-word; /* Wrap long words/tags */
+  overflow-wrap: break-word;
 }
 
 .tag-list {
@@ -507,11 +540,10 @@ body {
 
 .comments-section {
   padding: 20px;
-  background: var(--c-bg); /* Slightly different bg */
+  background: var(--c-bg);
   border-radius: 8px;
   margin-top: 15px;
   width: 100%;
-  /* max-width: 1600px; /* Optional max width */
   box-sizing: border-box;
 }
  .comments-section h4 {
@@ -617,73 +649,66 @@ body {
 /* --- Responsive Adjustments --- */
 @media (max-width: 768px) {
   body {
-    font-size: 13px; /* Slightly smaller base font */
+    font-size: 13px; 
   }
   .container {
-    flex-direction: column; /* Stack sidebar and content */
+    flex-direction: column; 
     padding: 15px;
     gap: 15px;
   }
 
   .header-content {
-    flex-direction: column; /* Stack title and search */
-    align-items: stretch; /* Full width elements */
+    flex-direction: column; 
+    align-items: stretch; 
     gap: 10px;
     padding: 15px;
   }
 
   #site-title {
     font-size: 1.5em;
-    text-align: center; /* Center title */
+    text-align: center; 
   }
 
   .tag-search {
     width: 100%;
-    max-width: 100%; /* Allow search to take full width */
+    max-width: 100%; 
   }
 
   .sidebar {
-    width: 100%; /* Full width */
-    position: static; /* No longer sticky */
-    margin-bottom: 20px; /* Space below sidebar */
-    top: auto; /* Reset sticky top */
+    width: 100%;
+    position: static; 
+    margin-bottom: 20px; 
+    top: auto; 
   }
 
   .image-list {
-    grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); /* Smaller thumbs */
     gap: 8px;
+    justify-content: center;
   }
 
   .thumb {
-    max-height: 180px;
-    aspect-ratio: 3 / 4; /* More vertical default on mobile? Or keep 4/3 */
+    width: 150px;
+    height: 150px;
   }
-   .thumb[data-aspect-ratio="tall"] {
-     max-height: 250px;
-     aspect-ratio: auto;
-   }
-   .thumb[data-aspect-ratio="wide"] {
-       aspect-ratio: auto;
-   }
 
   .media-view {
-    padding: 10px; /* Less padding on modal */
+    padding: 10px; 
   }
 
   .media-content {
-     max-width: 100%; /* Almost full width */
-     max-height: 95vh; /* More vertical space */
+     max-width: 100%; 
+     max-height: 95vh; 
      padding: 10px;
   }
 
   .media-content img,
   .media-content video {
-    max-height: 75vh; /* Adjust media height */
+    max-height: 75vh; 
     margin-bottom: 10px;
   }
 
   .media-info {
-    padding: 15px 10px; /* Adjust padding */
+    padding: 15px 10px; 
     font-size: 0.9em;
   }
   .comments-section {
@@ -714,21 +739,21 @@ body {
 
   /* Awesomplete adjustments for mobile */
   .awesomplete > ul {
-    max-height: 40vh; /* Limit list height */
-    font-size: 15px; /* Slightly larger text for touch */
+    max-height: 40vh; 
+    font-size: 15px; 
   }
 
   .awesomplete > ul > li {
     padding: 10px 14px;
   }
 
-  /* Input focus style on mobile */
+  
   .search-container input[type="text"]:focus {
     border-color: var(--c-link);
     box-shadow: 0 0 0 2px rgba(74, 222, 128, 0.2);
   }
 
-  /* Hero section adjustments */
+  
   .hero-title {
     font-size: 2.5em;
     margin-bottom: 20px;
@@ -736,10 +761,9 @@ body {
 
   .hero-content {
     padding: 20px;
-    width: 95%; /* Slightly less than full width */
+    width: 95%; 
   }
 
-  /* Comment adjustments */
   .comment {
     padding: 10px 0;
     font-size: 0.9em;
